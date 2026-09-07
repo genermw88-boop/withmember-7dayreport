@@ -7,7 +7,6 @@ st.set_page_config(page_title="위드멤버 마케팅 보고서 & 솔루션 시�
 if 'expected_rev' not in st.session_state:
     st.session_state.expected_rev = random.randint(1500, 2000) * 10000
 
-# 새로고침이나 체크박스 토글 시 점수가 매번 자연스럽게 갱신되도록 세션 상태 활용
 if 'score_booking' not in st.session_state:
     st.session_state.score_booking = random.randint(10, 15)
 if 'score_talk' not in st.session_state:
@@ -29,14 +28,12 @@ after_file = st.sidebar.file_uploader("After 이미지 업로드", type=['png', 
 st.sidebar.markdown("---")
 st.sidebar.subheader("🛠️ 플레이스 최적화 관리 항목")
 
-# 요청하신 5가지 항목 체크박스 배치
 use_booking = st.sidebar.checkbox(f"네이버 예약 연동 및 세팅 (+{st.session_state.score_booking}점)", value=True)
 use_talk = st.sidebar.checkbox(f"네이버 톡톡 응대 배너 적용 (+{st.session_state.score_talk}점)", value=True)
 use_call = st.sidebar.checkbox(f"안심번호 등록 및 키워드 최적화 (+{st.session_state.score_call}점)", value=True)
 use_news = st.sidebar.checkbox(f"플레이스 새소식 업데이트 (+{st.session_state.score_news}점)", value=True)
 use_keyword = st.sidebar.checkbox(f"플레이스 메인키워드 수정 (+{st.session_state.score_keyword}점)", value=True)
 
-# 체크 여부에 따른 최종 종합 점수 계산
 score_booking_val = st.session_state.score_booking if use_booking else 0
 score_talk_val = st.session_state.score_talk if use_talk else 0
 score_call_val = st.session_state.score_call if use_call else 0
@@ -55,8 +52,9 @@ def get_image_base64(uploaded_file):
 before_b64 = get_image_base64(before_file)
 after_b64 = get_image_base64(after_file)
 
-before_img_tag = f'<img src="{before_b64}" style="width: 100%; height: 100%; object-fit: cover; object-position: top; border-radius: 6px;" />' if before_b64 else '<span style="color: #94A3B8; font-size: 14px;">Before 이미지 미등록</span>'
-after_img_tag = f'<img src="{after_b64}" style="width: 100%; height: 100%; object-fit: cover; object-position: top; border-radius: 6px;" />' if after_b64 else '<span style="color: #94A3B8; font-size: 14px;">After 이미지 미등록</span>'
+# 요청하신 빨간색 세로형 규격에 맞추어 contain 속성 적용 및 비율 조정
+before_img_tag = f'<img src="{before_b64}" style="max-width: 100%; max-height: 100%; object-fit: contain; border-radius: 6px;" />' if before_b64 else '<span style="color: #94A3B8; font-size: 14px;">Before 이미지 미등록</span>'
+after_img_tag = f'<img src="{after_b64}" style="max-width: 100%; max-height: 100%; object-fit: contain; border-radius: 6px;" />' if after_b64 else '<span style="color: #94A3B8; font-size: 14px;">After 이미지 미등록</span>'
 
 details_html = ""
 if use_booking:
@@ -111,13 +109,13 @@ separate_reports_html = f"""
         <div class="section-title">[ 네이버 플레이스 개선 Before & After ]</div>
         <div style="display: flex; gap: 20px; justify-content: center; margin-bottom: 25px;">
             <div style="flex: 1; text-align: center; background: #F8FAFC; padding: 15px; border-radius: 8px; border: 1px solid #E2E8F0;">
-                <div style="width: 100%; height: 580px; display: flex; align-items: center; justify-content: center; margin-bottom: 10px; overflow: hidden; background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 6px;">
+                <div style="width: 100%; height: 680px; display: flex; align-items: center; justify-content: center; margin-bottom: 10px; overflow: hidden; background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 6px;">
                     {before_img_tag}
                 </div>
                 <div style="display: inline-block; background: #F1F5F9; padding: 4px 16px; border-radius: 4px; font-weight: bold; color: #475569; font-size: 13px; margin-top: 5px;">Before</div>
             </div>
             <div style="flex: 1; text-align: center; background: #F8FAFC; padding: 15px; border-radius: 8px; border: 1px solid #E2E8F0;">
-                <div style="width: 100%; height: 580px; display: flex; align-items: center; justify-content: center; margin-bottom: 10px; overflow: hidden; background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 6px;">
+                <div style="width: 100%; height: 680px; display: flex; align-items: center; justify-content: center; margin-bottom: 10px; overflow: hidden; background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 6px;">
                     {after_img_tag}
                 </div>
                 <div style="display: inline-block; background: #EFF6FF; padding: 4px 16px; border-radius: 4px; font-weight: bold; color: #2563EB; font-size: 13px; margin-top: 5px;">After</div>
@@ -212,4 +210,4 @@ function downloadReport(elementId, filename) {{
 </html>
 """
 
-st.components.v1.html(separate_reports_html, height=2050, scrolling=True)
+st.components.v1.html(separate_reports_html, height=2150, scrolling=True)
