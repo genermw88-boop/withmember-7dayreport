@@ -78,11 +78,7 @@ score_talk = 10 if use_talk else 0
 score_call = 11 if use_call else 0
 total_seo_score = base_score + score_booking + score_talk + score_call
 
-st.info(f"💡 **현재 적용된 총 최적화 상승 점수:** **{total_seo_score}점** 상승 (기본 {base_score}점" +
-         (f" + 예약 {score_booking}점" if use_booking else "") +
-         (f" + 톡톡 {score_talk}점" if use_talk else "") +
-         (f" + 안심번호 {score_call}점" if use_call else "") + ")")
-
+st.info(f"💡 **현재 적용된 총 최적화 상승 점수:** **{total_seo_score}점** 상승")
 st.markdown("---")
 
 # 2. 위드멤버 1년 마케팅 솔루션
@@ -99,20 +95,21 @@ st.markdown("---")
 st.header("3. 3개월 뒤 예상 상승 매출액")
 st.write(f"예상 상승 매출액: **{st.session_state.expected_rev:,}원**")
 
-# 이미지 생성 함수 1: 체험 결과 (삽입 이미지 더욱 확대 및 관리 내역 반영)
+# 이미지 생성 함수 1: 체험 결과 (완벽한 좌우 대칭 및 정렬)
 def generate_result_image(before_upload, after_upload, use_b, use_t, use_c, total_score):
     font_path = load_font()
-    img = Image.new('RGB', (1000, 1300), color="#F8F9FA")
+    img = Image.new('RGB', (1000, 1320), color="#F8F9FA")
     draw = ImageDraw.Draw(img)
     
     try:
-        font_title = ImageFont.truetype(font_path, 40) if font_path else ImageFont.load_default()
-        font_sub = ImageFont.truetype(font_path, 28) if font_path else ImageFont.load_default()
+        font_title = ImageFont.truetype(font_path, 38) if font_path else ImageFont.load_default()
+        font_sub = ImageFont.truetype(font_path, 26) if font_path else ImageFont.load_default()
         font_body = ImageFont.truetype(font_path, 20) if font_path else ImageFont.load_default()
-        font_bold = ImageFont.truetype(font_path, 24) if font_path else ImageFont.load_default()
+        font_bold = ImageFont.truetype(font_path, 22) if font_path else ImageFont.load_default()
     except:
         font_title = font_sub = font_body = font_bold = ImageFont.load_default()
 
+    # 상단 타이틀 영역 (1000폭 기준 완벽 중앙)
     draw.rectangle([0, 0, 1000, 110], fill="#1E3A8A")
     draw.text((50, 32), "위드멤버 1주 무료체험 결과 요약 보고서", font=font_title, fill="white")
     
@@ -125,23 +122,23 @@ def generate_result_image(before_upload, after_upload, use_b, use_t, use_c, tota
             img_b = Image.open(before_upload).convert("RGB")
             img_a = Image.open(after_upload).convert("RGB")
             
-            # 플레이스 이미지 크기 대폭 확대 (440x580)
-            img_b = resize_with_aspect_ratio(img_b, 440, 580)
-            img_a = resize_with_aspect_ratio(img_a, 440, 580)
+            # 플레이스 이미지 크기 및 간격 최적화 (좌우 대칭 배치)
+            img_b = resize_with_aspect_ratio(img_b, 420, 560)
+            img_a = resize_with_aspect_ratio(img_a, 420, 560)
             
-            img.paste(img_b, (50, 185))
-            img.paste(img_a, (510, 185))
+            img.paste(img_b, (60, 185))
+            img.paste(img_a, (520, 185))
             
-            draw.text((235, 780), "Before", font=font_bold, fill="#495057")
-            draw.text((695, 780), "After", font=font_bold, fill="#495057")
+            draw.text((245, 755), "Before", font=font_bold, fill="#495057")
+            draw.text((705, 755), "After", font=font_bold, fill="#495057")
         except Exception:
             pass
             
-    # 플레이스 관리 세부 내역 영역
-    draw.rectangle([50, 830, 950, 1180], fill="white", outline="#CED4DA", width=2)
-    draw.text((75, 850), "📌 위드멤버 플레이스 중점 관리 및 상승 내역", font=font_bold, fill="#1E3A8A")
+    # 플레이스 관리 세부 내역 박스 (50 ~ 950, 폭 900)
+    draw.rectangle([50, 805, 950, 1170], fill="white", outline="#CED4DA", width=2)
+    draw.text((80, 825), "📌 위드멤버 플레이스 중점 관리 및 상승 내역", font=font_bold, fill="#1E3A8A")
     
-    y_pos = 900
+    y_pos = 875
     details = [("기본 플레이스 SEO 최적화 및 정보 정비", "+30점", True)]
     if use_b:
         details.append(("네이버 예약 연동 (고객 편의성 및 체류 시간 증대)", "+12점", True))
@@ -152,25 +149,25 @@ def generate_result_image(before_upload, after_upload, use_b, use_t, use_c, tota
         
     for text, score, active in details:
         draw.text((80, y_pos), f"• {text}", font=font_body, fill="#333333" if active else "#ADB5BD")
-        draw.text((820, y_pos), score, font=font_body, fill="#0D6EFD" if active else "#ADB5BD")
-        y_pos += 40
+        draw.text((840, y_pos), score, font=font_body, fill="#0D6EFD" if active else "#ADB5BD")
+        y_pos += 42
         
-    draw.line([(75, y_pos + 10), (925, y_pos + 10)], fill="#DEE2E6", width=2)
-    draw.text((75, y_pos + 30), f"✅ 확보된 플레이스 최적화 점수 총합: {total_score}점 상승", font=font_title, fill="#DC3545")
+    draw.line([(80, y_pos + 5), (920, y_pos + 5)], fill="#DEE2E6", width=2)
+    draw.text((80, y_pos + 25), f"✅ 확보된 플레이스 최적화 점수 총합: {total_score}점 상승", font=font_sub, fill="#DC3545")
     
     buf = io.BytesIO()
     img.save(buf, format="PNG")
     return buf.getvalue()
 
-# 이미지 생성 함수 2: 마케팅 솔루션 & 매출 그래프 (완전 중앙 정렬)
+# 이미지 생성 함수 2: 마케팅 솔루션 & 매출 그래프 (완벽 중앙 정렬)
 def generate_solution_image(expected_revenue):
     font_path = load_font()
     img = Image.new('RGB', (1000, 1350), color="#F8F9FA")
     draw = ImageDraw.Draw(img)
     
     try:
-        font_title = ImageFont.truetype(font_path, 40) if font_path else ImageFont.load_default()
-        font_sub = ImageFont.truetype(font_path, 30) if font_path else ImageFont.load_default()
+        font_title = ImageFont.truetype(font_path, 38) if font_path else ImageFont.load_default()
+        font_sub = ImageFont.truetype(font_path, 26) if font_path else ImageFont.load_default()
         font_body = ImageFont.truetype(font_path, 20) if font_path else ImageFont.load_default()
     except:
         font_title = font_sub = font_body = ImageFont.load_default()
@@ -190,7 +187,7 @@ def generate_solution_image(expected_revenue):
     y = 210
     for title, desc in services:
         draw.text((50, y), title, font=font_sub, fill="#0D6EFD")
-        draw.text((75, y + 42), f"- {desc}", font=font_body, fill="#495057")
+        draw.text((75, y + 40), f"- {desc}", font=font_body, fill="#495057")
         y += 95
         
     draw.line([(50, y + 10), (950, y + 10)], fill="#DEE2E6", width=2)
@@ -199,14 +196,14 @@ def generate_solution_image(expected_revenue):
     draw.text((50, y), "[3개월 뒤 예상 상승 매출액 및 추이]", font=font_sub, fill="#212529")
     y += 65
     
-    # 매출 강조 박스 (정가운데 배치)
+    # 매출 강조 박스 (폭 900 좌우 대칭)
     draw.rectangle([50, y, 950, y + 90], fill="#FFF5F5", outline="#FFC9C9", width=2)
     rev_text = f"💰 총 예상 상승액: {expected_revenue:,} 원"
-    draw.text((230, y + 25), rev_text, font=font_title, fill="#DC3545")
+    draw.text((250, y + 26), rev_text, font=font_sub, fill="#DC3545")
     
-    y += 145
+    y += 140
     
-    # === 꺾은선 그래프 완벽 중앙 정렬 ===
+    # 꺾은선 그래프 영역 중앙 정렬
     graph_x, graph_y = 120, y
     graph_w, graph_h = 760, 240
     
@@ -222,12 +219,11 @@ def generate_solution_image(expected_revenue):
         py = (graph_y + graph_h) - (graph_h * (values[i] / expected_revenue))
         points.append((px, py))
         
-        # X축 라벨 중앙 정렬 오프셋 적용
         draw.text((px - 35, graph_y + graph_h + 15), labels[i], font=font_body, fill="#495057")
         
         if i > 0:
             val_text = f"{int(values[i]/10000):,}만"
-            draw.text((px - 30, py - 35), val_text, font=font_body, fill="#0D6EFD")
+            draw.text((px - 32, py - 35), val_text, font=font_body, fill="#0D6EFD")
 
     draw.line(points, fill="#0D6EFD", width=4)
     for p in points:
