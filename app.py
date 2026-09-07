@@ -7,6 +7,18 @@ st.set_page_config(page_title="위드멤버 마케팅 보고서 & 솔루션 시�
 if 'expected_rev' not in st.session_state:
     st.session_state.expected_rev = random.randint(1500, 2000) * 10000
 
+# 새로고침이나 체크박스 토글 시 점수가 매번 자연스럽게 갱신되도록 세션 상태 활용
+if 'score_booking' not in st.session_state:
+    st.session_state.score_booking = random.randint(10, 15)
+if 'score_talk' not in st.session_state:
+    st.session_state.score_talk = random.randint(8, 12)
+if 'score_call' not in st.session_state:
+    st.session_state.score_call = random.randint(9, 14)
+if 'score_news' not in st.session_state:
+    st.session_state.score_news = random.randint(10, 15)
+if 'score_keyword' not in st.session_state:
+    st.session_state.score_keyword = random.randint(12, 18)
+
 st.title("📊 위드멤버 마케팅 보고서 & 1년 솔루션 분리 출력 시스템")
 st.markdown("---")
 
@@ -16,14 +28,22 @@ after_file = st.sidebar.file_uploader("After 이미지 업로드", type=['png', 
 
 st.sidebar.markdown("---")
 st.sidebar.subheader("🛠️ 플레이스 최적화 관리 항목")
-use_booking = st.sidebar.checkbox("네이버 예약 연동 및 세팅 (+12점)", value=True)
-use_talk = st.sidebar.checkbox("네이버 톡톡 응대 배너 적용 (+10점)", value=True)
-use_call = st.sidebar.checkbox("안심번호 등록 및 키워드 최적화 (+11점)", value=True)
 
-score_booking = 12 if use_booking else 0
-score_talk = 10 if use_talk else 0
-score_call = 11 if use_call else 0
-total_seo_score = score_booking + score_talk + score_call
+# 요청하신 5가지 항목 체크박스 배치
+use_booking = st.sidebar.checkbox(f"네이버 예약 연동 및 세팅 (+{st.session_state.score_booking}점)", value=True)
+use_talk = st.sidebar.checkbox(f"네이버 톡톡 응대 배너 적용 (+{st.session_state.score_talk}점)", value=True)
+use_call = st.sidebar.checkbox(f"안심번호 등록 및 키워드 최적화 (+{st.session_state.score_call}점)", value=True)
+use_news = st.sidebar.checkbox(f"플레이스 새소식 업데이트 (+{st.session_state.score_news}점)", value=True)
+use_keyword = st.sidebar.checkbox(f"플레이스 메인키워드 수정 (+{st.session_state.score_keyword}점)", value=True)
+
+# 체크 여부에 따른 최종 종합 점수 계산
+score_booking_val = st.session_state.score_booking if use_booking else 0
+score_talk_val = st.session_state.score_talk if use_talk else 0
+score_call_val = st.session_state.score_call if use_call else 0
+score_news_val = st.session_state.score_news if use_news else 0
+score_keyword_val = st.session_state.score_keyword if use_keyword else 0
+
+total_seo_score = score_booking_val + score_talk_val + score_call_val + score_news_val + score_keyword_val
 
 def get_image_base64(uploaded_file):
     if uploaded_file is not None:
@@ -40,16 +60,19 @@ after_img_tag = f'<img src="{after_b64}" style="width: 100%; height: 100%; objec
 
 details_html = ""
 if use_booking:
-    details_html += '<div style="display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 14px;"><span style="color: #334155;">• 네이버 예약 연동 (고객 편의성 및 체류 시간 증대)</span><span style="color: #2563EB; font-weight: bold;">+12점</span></div>'
+    details_html += f'<div style="display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 14px;"><span style="color: #334155;">• 네이버 예약 연동 (고객 편의성 및 체류 시간 증대)</span><span style="color: #2563EB; font-weight: bold;">+{score_booking_val}점</span></div>'
 if use_talk:
-    details_html += '<div style="display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 14px;"><span style="color: #334155;">• 네이버 톡톡 응대 배너 적용 (실시간 소통 지수 반영)</span><span style="color: #2563EB; font-weight: bold;">+10점</span></div>'
+    details_html += f'<div style="display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 14px;"><span style="color: #334155;">• 네이버 톡톡 응대 배너 적용 (실시간 소통 지수 반영)</span><span style="color: #2563EB; font-weight: bold;">+{score_talk_val}점</span></div>'
 if use_call:
-    details_html += '<div style="display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 14px;"><span style="color: #334155;">• 안심번호 등록 및 검색 노출 알고리즘 최적화</span><span style="color: #2563EB; font-weight: bold;">+11점</span></div>'
+    details_html += f'<div style="display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 14px;"><span style="color: #334155;">• 안심번호 등록 및 키워드 최적화</span><span style="color: #2563EB; font-weight: bold;">+{score_call_val}점</span></div>'
+if use_news:
+    details_html += f'<div style="display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 14px;"><span style="color: #334155;">• 플레이스 새소식 업데이트 (활성화 지수 및 최신성 확보)</span><span style="color: #2563EB; font-weight: bold;">+{score_news_val}점</span></div>'
+if use_keyword:
+    details_html += f'<div style="display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 14px;"><span style="color: #334155;">• 플레이스 메인키워드 수정 (타겟 검색 유입 극대화)</span><span style="color: #2563EB; font-weight: bold;">+{score_keyword_val}점</span></div>'
 
 rev = st.session_state.expected_rev
 rev_formatted = f"{rev:,}"
 
-# 빨간 선의 기울기(초반엔 완만하다가 후반에 폭발적으로 증가하는 J커브 형태)에 맞춘 월별 매출액 배분
 m1 = int(rev * 0.15 / 10000)
 m2 = int(rev * 0.45 / 10000)
 m3 = int(rev / 10000)
@@ -149,17 +172,10 @@ separate_reports_html = f"""
             💰 총 예상 상승액: {rev_formatted} 원
         </div>
         
-        <!-- [수정완료] 요청하신 빨간 선(J커브 형태의 급상승 곡선) 모양대로 매출액 그래프 선을 완벽히 일치시킴 -->
         <div style="background: #F8FAFC; border: 1px solid #E2E8F0; padding: 20px 25px 15px 25px; border-radius: 6px; text-align: center; width: 100%; box-sizing: border-box;">
             <svg viewBox="0 0 800 220" width="100%" height="100%" style="overflow: visible;">
-                
-                <!-- 참고용 배경 그리드 라인 -->
-                <line x1="100" y1="175" x2="730" y2="35" stroke="#E2E8F0" stroke-width="1.5" stroke-dasharray="4,4" />
-                
-                <!-- 요청하신 빨간 선 모양(초반 완만 후 후반 급상승하는 J커브 궤적)을 그대로 반영한 매출액 상승 곡선 (path 베지에 곡선 활용) -->
                 <path d="M 100,175 Q 400,165 730,35" fill="none" stroke="#DC2626" stroke-width="4" />
                 
-                <!-- 각 포인트 및 텍스트 레이아웃 -->
                 <circle cx="100" cy="175" r="6" fill="#DC2626" stroke="white" stroke-width="2"/>
                 <text x="100" y="205" font-size="13" fill="#475569" text-anchor="middle" font-weight="bold">관리 시작</text>
                 
