@@ -34,10 +34,8 @@ def resize_with_aspect_ratio(image, target_width, target_height):
     try:
         resized_img = image.resize((new_width, new_height), Image.Resampling.LANCZOS)
     except AttributeError:
-        # Pillow 구버전 호환용
         resized_img = image.resize((new_width, new_height), Image.LANCZOS)
         
-    # 흰색 배경 캔버스 생성 후 중앙 배치
     new_image = Image.new("RGB", (target_width, target_height), "white")
     offset_x = (target_width - new_width) // 2
     offset_y = (target_height - new_height) // 2
@@ -48,7 +46,6 @@ def resize_with_aspect_ratio(image, target_width, target_height):
 # 페이지 기본 설정
 st.set_page_config(page_title="위드멤버 결과 보고 및 솔루션 제안", layout="wide")
 
-# 세션 상태 초기화 (랜덤 매출액 및 랜덤 SEO 점수 고정)
 if 'expected_rev' not in st.session_state:
     st.session_state.expected_rev = random.randint(1500, 2000) * 10000
 if 'random_seo_score' not in st.session_state:
@@ -87,10 +84,10 @@ st.markdown("---")
 st.header("3. 3개월 뒤 예상 상승 매출액")
 st.write(f"예상 상승 매출액: **{st.session_state.expected_rev:,}원**")
 
-# 이미지 생성 함수 1: 체험 결과 (Before & After)
+# 이미지 생성 함수 1: 체험 결과 (캔버스 높이 및 사진 영역 대폭 확대)
 def generate_result_image(before_upload, after_upload, seo_score):
     font_path = load_font()
-    img = Image.new('RGB', (1000, 800), color="#F8F9FA")
+    img = Image.new('RGB', (1000, 1150), color="#F8F9FA") # 캔버스 높이 증가
     draw = ImageDraw.Draw(img)
     
     try:
@@ -112,38 +109,37 @@ def generate_result_image(before_upload, after_upload, seo_score):
             img_b = Image.open(before_upload).convert("RGB")
             img_a = Image.open(after_upload).convert("RGB")
             
-            # 비율 유지 리사이징 적용
-            img_b = resize_with_aspect_ratio(img_b, 410, 350)
-            img_a = resize_with_aspect_ratio(img_a, 410, 350)
+            # 사진 크기 할당 영역 420x650으로 대폭 확대
+            img_b = resize_with_aspect_ratio(img_b, 420, 650)
+            img_a = resize_with_aspect_ratio(img_a, 420, 650)
             
             img.paste(img_b, (60, 230))
-            img.paste(img_a, (530, 230))
+            img.paste(img_a, (520, 230))
             
-            draw.text((230, 600), "Before", font=font_bold, fill="#495057")
-            draw.text((700, 600), "After", font=font_bold, fill="#495057")
+            draw.text((230, 910), "Before", font=font_bold, fill="#495057")
+            draw.text((690, 910), "After", font=font_bold, fill="#495057")
         except Exception:
             pass
             
-    draw.line([(60, 650), (940, 650)], fill="#DEE2E6", width=2)
-    draw.text((60, 690), f"✅ 확보된 플레이스 최적화 점수: {seo_score}점 상승", font=font_title, fill="#0D6EFD")
+    draw.line([(60, 970), (940, 970)], fill="#DEE2E6", width=2)
+    draw.text((60, 1020), f"✅ 확보된 플레이스 최적화 점수: {seo_score}점 상승", font=font_title, fill="#0D6EFD")
     
     buf = io.BytesIO()
     img.save(buf, format="PNG")
     return buf.getvalue()
 
-# 이미지 생성 함수 2: 마케팅 솔루션 & 매출 그래프
+# 이미지 생성 함수 2: 마케팅 솔루션 (캔버스 높이 확대 및 그래프 위치 조정)
 def generate_solution_image(expected_revenue):
     font_path = load_font()
-    img = Image.new('RGB', (1000, 1100), color="#F8F9FA")
+    img = Image.new('RGB', (1000, 1300), color="#F8F9FA") # 캔버스 높이 1300으로 증가
     draw = ImageDraw.Draw(img)
     
     try:
         font_title = ImageFont.truetype(font_path, 42) if font_path else ImageFont.load_default()
         font_sub = ImageFont.truetype(font_path, 32) if font_path else ImageFont.load_default()
         font_body = ImageFont.truetype(font_path, 22) if font_path else ImageFont.load_default()
-        font_small = ImageFont.truetype(font_path, 18) if font_path else ImageFont.load_default()
     except:
-        font_title = font_sub = font_body = font_small = ImageFont.load_default()
+        font_title = font_sub = font_body = ImageFont.load_default()
 
     draw.rectangle([0, 0, 1000, 120], fill="#1E3A8A")
     draw.text((60, 35), "위드멤버 1년 마케팅 솔루션 제안서", font=font_title, fill="white")
@@ -169,17 +165,15 @@ def generate_solution_image(expected_revenue):
     draw.text((60, y), "[3개월 뒤 예상 상승 매출액 및 추이]", font=font_sub, fill="#212529")
     y += 70
     
-    # 붉은색 하이라이트 박스 및 텍스트
     draw.rectangle([60, y, 940, y + 100], fill="#FFF5F5", outline="#FFC9C9", width=2)
     draw.text((280, y + 25), f"💰 총 예상 상승액: {expected_revenue:,} 원", font=font_title, fill="#DC3545")
     
-    y += 160
+    y += 180 # 공간 확보
     
-    # === PIL을 이용한 꺾은선 그래프 그리기 ===
+    # 꺾은선 그래프 여백 및 크기 상향
     graph_x, graph_y = 150, y
-    graph_w, graph_h = 700, 200
+    graph_w, graph_h = 700, 250 
     
-    # X축 선
     draw.line([(graph_x, graph_y + graph_h), (graph_x + graph_w, graph_y + graph_h)], fill="#ADB5BD", width=3)
     
     labels = ["관리 시작", "1개월 차", "2개월 차", "3개월 차"]
@@ -189,19 +183,15 @@ def generate_solution_image(expected_revenue):
     x_step = graph_w / 3
     for i in range(4):
         px = graph_x + (i * x_step)
-        # 매출액 비율에 맞춰 y좌표 계산 (위쪽이 0이므로 빼줌)
         py = (graph_y + graph_h) - (graph_h * (values[i] / expected_revenue))
         points.append((px, py))
         
-        # X축 라벨 텍스트
-        draw.text((px - 30, graph_y + graph_h + 15), labels[i], font=font_body, fill="#495057")
+        draw.text((px - 35, graph_y + graph_h + 20), labels[i], font=font_body, fill="#495057")
         
-        # 그래프 위 금액 수치 텍스트 (시작점 제외)
         if i > 0:
             val_text = f"{int(values[i]/10000):,}만"
-            draw.text((px - 30, py - 35), val_text, font=font_body, fill="#0D6EFD")
+            draw.text((px - 35, py - 35), val_text, font=font_body, fill="#0D6EFD")
 
-    # 선과 포인트(점) 그리기
     draw.line(points, fill="#0D6EFD", width=4)
     for p in points:
         draw.ellipse([p[0]-7, p[1]-7, p[0]+7, p[1]+7], fill="#DC3545", outline="white", width=2)
@@ -210,7 +200,6 @@ def generate_solution_image(expected_revenue):
     img.save(buf, format="PNG")
     return buf.getvalue()
 
-# 다운로드 버튼 영역
 st.header("📥 분석 리포트 다운로드 (2종)")
 st.write("이미지가 업로드되면 다운로드 버튼이 활성화됩니다.")
 
@@ -229,7 +218,7 @@ if before_img and after_img:
     with col_btn2:
         img2_bytes = generate_solution_image(st.session_state.expected_rev)
         st.download_button(
-            label="2️⃣ 마케팅 솔루션 및 매출 그래프 이미지 다운로드",
+            label="2️⃣ 마케팅 솔루션 및 매출 그래프 다운로드",
             data=img2_bytes,
             file_name="2_위드멤버_솔루션제안.png",
             mime="image/png"
