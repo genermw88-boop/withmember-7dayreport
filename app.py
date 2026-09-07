@@ -1,68 +1,25 @@
 import streamlit as st
-import pandas as pd
 import random
-import io
-import os
-import urllib.request
-from PIL import Image, ImageDraw, ImageFont
+import base64
 
-@st.cache_resource
-def load_font():
-    font_path = "NanumGothic.ttf"
-    if not os.path.exists(font_path):
-        try:
-            url = "https://raw.githubusercontent.com/google/fonts/main/ofl/nanumgothic/NanumGothic-Regular.ttf"
-            urllib.request.urlretrieve(url, font_path)
-        except Exception:
-            return None
-    return font_path
-
-def resize_with_aspect_ratio(image, target_width, target_height):
-    img_ratio = image.width / image.height
-    target_ratio = target_width / target_height
-    
-    if img_ratio > target_ratio:
-        new_width = target_width
-        new_height = int(target_width / img_ratio)
-    else:
-        new_height = target_height
-        new_width = int(target_height * img_ratio)
-        
-    try:
-        resized_img = image.resize((new_width, new_height), Image.Resampling.LANCZOS)
-    except AttributeError:
-        resized_img = image.resize((new_width, new_height), Image.LANCZOS)
-        
-    new_image = Image.new("RGB", (target_width, target_height), (255, 255, 255))
-    offset_x = (target_width - new_width) // 2
-    offset_y = (target_height - new_height) // 2
-    new_image.paste(resized_img, (offset_x, offset_y))
-    return new_image
-
-st.set_page_config(page_title="위드멤버 결과 보고 및 솔루션 제안", layout="wide")
+st.set_page_config(page_title="위드멤버 통합 마케팅 리포트 및 솔루션", layout="wide")
 
 if 'expected_rev' not in st.session_state:
     st.session_state.expected_rev = random.randint(1500, 2000) * 10000
 
-st.title("📊 1주 무료체험 결과 및 솔루션 제안")
+st.title("📊 위드멤버 마케팅 보고서 & 1년 솔루션 통합 시스템")
 st.markdown("---")
 
-st.header("1. 네이버 플레이스 개선 Before & After & 관리 항목 세팅")
-col_set1, col_set2 = st.columns(2)
-with col_set1:
-    before_img = st.file_uploader("Before 이미지를 업로드하세요", type=['png', 'jpg', 'jpeg'])
-    if before_img is not None:
-        st.image(before_img, use_container_width=True)
+# 1. 사이드바 또는 상단 입력부 설정
+st.sidebar.header("⚙️ 리포트 설정 및 이미지 입력")
+before_file = st.sidebar.file_uploader("Before 이미지 업로드", type=['png', 'jpg', 'jpeg'])
+after_file = st.sidebar.file_uploader("After 이미지 업로드", type=['png', 'jpg', 'jpeg'])
 
-with col_set2:
-    after_img = st.file_uploader("After 이미지를 업로드하세요", type=['png', 'jpg', 'jpeg'])
-    if after_img is not None:
-        st.image(after_img, use_container_width=True)
-
-st.markdown("### 🛠️ 플레이스 최적화 관리 항목 선택")
-use_booking = st.checkbox("네이버 예약 연동 및 세팅 (고객 유입 편의성 증대)", value=True)
-use_talk = st.checkbox("네이버 톡톡 세팅 및 응대 배너 적용 (소통 지수 상승)", value=True)
-use_call = st.checkbox("안심번호 등록 및 키워드 최적화 (검색 알고리즘 반영)", value=True)
+st.sidebar.markdown("---")
+st.sidebar.subheader("🛠️ 플레이스 최적화 관리 항목")
+use_booking = st.sidebar.checkbox("네이버 예약 연동 및 세팅 (+12점)", value=True)
+use_talk = st.sidebar.checkbox("네이버 톡톡 응대 배너 적용 (+10점)", value=True)
+use_call = st.sidebar.checkbox("안심번호 등록 및 키워드 최적화 (+11점)", value=True)
 
 base_score = 30
 score_booking = 12 if use_booking else 0
@@ -70,200 +27,165 @@ score_talk = 10 if use_talk else 0
 score_call = 11 if use_call else 0
 total_seo_score = base_score + score_booking + score_talk + score_call
 
-st.info(f"💡 **현재 적용된 총 최적화 상승 점수:** **{total_seo_score}점** 상승")
-st.markdown("---")
+def get_image_base64(uploaded_file):
+    if uploaded_file is not None:
+        bytes_data = uploaded_file.getvalue()
+        encoded = base64.b64encode(bytes_data).decode()
+        return f"data:image/png;base64,{encoded}"
+    return None
 
-st.header("2. 위드멤버 1년 마케팅 솔루션")
-st.markdown("""
-* **네이버 플레이스 세팅 및 관리 (SEO최적화):** 단순 세팅을 넘어선 알고리즘 맞춤형 순위 최적화 및 지속 관리
-* **맞춤형 블로그 체험단 운영:** 매장 타겟층 정밀 분석을 통한 최적화 블로그 후보 검수 및 고품질 리뷰 배포
-* **숏폼 영상 콘텐츠 기획 및 제작:** 트렌디한 인스타그램 릴스 및 유튜브 쇼츠 배포를 통한 바이럴 확산
-* **평점 및 리뷰 매니지먼트:** 카카오맵 및 구글 맵스 고품질 리뷰 30건 구축으로 매장 신뢰도 극대화
-""")
-st.markdown("---")
+before_b64 = get_image_base64(before_file)
+after_b64 = get_image_base64(after_file)
 
-st.header("3. 3개월 뒤 예상 상승 매출액")
-st.write(f"예상 상승 매출액: **{st.session_state.expected_rev:,}원**")
+before_img_tag = f'<img src="{before_b64}" style="max-width: 100%; max-height: 320px; object-fit: contain; border-radius: 6px;" />' if before_b64 else '<span style="color: #94A3B8; font-size: 14px;">Before 이미지 미등록</span>'
+after_img_tag = f'<img src="{after_b64}" style="max-width: 100%; max-height: 320px; object-fit: contain; border-radius: 6px;" />' if after_b64 else '<span style="color: #94A3B8; font-size: 14px;">After 이미지 미등록</span>'
 
-def generate_result_image(before_upload, after_upload, use_b, use_t, use_c, total_score):
-    font_path = load_font()
-    img = Image.new('RGB', (1200, 1650), color="#F8FAFC")
-    draw = ImageDraw.Draw(img)
-    
-    try:
-        font_title = ImageFont.truetype(font_path, 40) if font_path else ImageFont.load_default()
-        font_sub = ImageFont.truetype(font_path, 26) if font_path else ImageFont.load_default()
-        font_body = ImageFont.truetype(font_path, 20) if font_path else ImageFont.load_default()
-        font_bold = ImageFont.truetype(font_path, 22) if font_path else ImageFont.load_default()
-        font_badge = ImageFont.truetype(font_path, 24) if font_path else ImageFont.load_default()
-    except:
-        font_title = font_sub = font_body = font_bold = font_badge = ImageFont.load_default()
+details_html = f"""
+    <div style="display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 14px;">
+        <span style="color: #334155;">• 기본 플레이스 SEO 최적화 및 정보 정비</span>
+        <span style="color: #2563EB; font-weight: bold;">+30점</span>
+    </div>
+"""
+if use_booking:
+    details_html += '<div style="display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 14px;"><span style="color: #334155;">• 네이버 예약 연동 (고객 편의성 및 체류 시간 증대)</span><span style="color: #2563EB; font-weight: bold;">+12점</span></div>'
+if use_talk:
+    details_html += '<div style="display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 14px;"><span style="color: #334155;">• 네이버 톡톡 응대 배너 적용 (실시간 소통 지수 반영)</span><span style="color: #2563EB; font-weight: bold;">+10점</span></div>'
+if use_call:
+    details_html += '<div style="display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 14px;"><span style="color: #334155;">• 안심번호 등록 및 검색 노출 알고리즘 최적화</span><span style="color: #2563EB; font-weight: bold;">+11점</span></div>'
 
-    # 상단 헤더 (높이 140, 수직 중앙 정렬)
-    draw.rectangle([0, 0, 1200, 140], fill="#0F172A")
-    draw.text((60, 48), "위드멤버 1주 무료체험 결과 요약 보고서", font=font_title, fill="white")
-    
-    draw.text((60, 180), "[ 네이버 플레이스 개선 Before & After ]", font=font_sub, fill="#1E293B")
-    
-    # 카드 영역 (폭 520, 높이 660, X좌표: 60 및 620)
-    card_y = 230
-    card_w = 520
-    card_h = 660
-    
-    draw.rectangle([60, card_y, 60 + card_w, card_y + card_h], fill="white", outline="#CBD5E1", width=2)
-    draw.rectangle([620, card_y, 620 + card_w, card_y + card_h], fill="white", outline="#CBD5E1", width=2)
-    
-    if before_upload and after_upload:
-        try:
-            before_upload.seek(0)
-            after_upload.seek(0)
-            img_b = Image.open(before_upload).convert("RGB")
-            img_a = Image.open(after_upload).convert("RGB")
+rev = st.session_state.expected_rev
+rev_formatted = f"{rev:,}"
+m1 = int(rev * 0.25 / 10000)
+m2 = int(rev * 0.60 / 10000)
+m3 = int(rev / 10000)
+
+# 2. 하나의 완벽한 보고서 및 제안서 통합 HTML 코드로 작성 (html2canvas 버튼 포함)
+integrated_report_html = f"""
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<style>
+    body {{ font-family: 'Nanum Gothic', sans-serif; background: #F1F5F9; margin: 0; padding: 20px; }}
+    .main-wrapper {{ max-width: 900px; margin: 0 auto; }}
+    .download-bar {{ text-align: right; margin-bottom: 15px; }}
+    .download-btn {{ background: #2563EB; color: white; border: none; padding: 12px 24px; font-size: 15px; font-weight: bold; border-radius: 6px; cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }}
+    .download-btn:hover {{ background: #1D4ED8; }}
+    .report-card {{ background: #FFFFFF; padding: 35px; border-radius: 12px; border: 1px solid #CBD5E1; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); margin-bottom: 30px; }}
+    .header-banner {{ background: #0F172A; color: white; padding: 20px 25px; border-radius: 8px; font-size: 20px; font-weight: bold; margin-bottom: 25px; }}
+    .section-title {{ color: #1E293B; font-size: 16px; font-weight: bold; margin-bottom: 15px; border-left: 4px solid #2563EB; padding-left: 10px; }}
+</style>
+</head>
+<body>
+
+<div class="main-wrapper">
+    <div class="download-bar">
+        <button class="download-btn" onclick="downloadFullReport()">📥 전체 보고서 이미지로 저장</button>
+    </div>
+
+    <div id="capture-area">
+        <!-- 첫 번째 섹션: 1주 무료체험 결과 요약 보고서 -->
+        <div class="report-card">
+            <div class="header-banner">
+                위드멤버 1주 무료체험 결과 요약 보고서
+            </div>
             
-            img_b = resize_with_aspect_ratio(img_b, 460, 550)
-            img_a = resize_with_aspect_ratio(img_a, 460, 550)
+            <div class="section-title">[ 네이버 플레이스 개선 Before & After ]</div>
+            <div style="display: flex; gap: 15px; justify-content: center; margin-bottom: 25px;">
+                <div style="flex: 1; text-align: center; background: #F8FAFC; padding: 15px; border-radius: 8px; border: 1px solid #E2E8F0;">
+                    <div style="min-height: 300px; display: flex; align-items: center; justify-content: center; margin-bottom: 10px;">
+                        {before_img_tag}
+                    </div>
+                    <div style="display: inline-block; background: #F1F5F9; padding: 4px 16px; border-radius: 4px; font-weight: bold; color: #475569; font-size: 13px;">Before</div>
+                </div>
+                <div style="flex: 1; text-align: center; background: #F8FAFC; padding: 15px; border-radius: 8px; border: 1px solid #E2E8F0;">
+                    <div style="min-height: 300px; display: flex; align-items: center; justify-content: center; margin-bottom: 10px;">
+                        {after_img_tag}
+                    </div>
+                    <div style="display: inline-block; background: #EFF6FF; padding: 4px 16px; border-radius: 4px; font-weight: bold; color: #2563EB; font-size: 13px;">After</div>
+                </div>
+            </div>
+
+            <div style="background: #FAFAFA; border: 1px solid #E2E8F0; padding: 20px; border-radius: 8px;">
+                <div style="font-weight: bold; color: #0F172A; margin-bottom: 15px; font-size: 14px;">📌 위드멤버 플레이스 중점 관리 및 상승 내역</div>
+                {details_html}
+                <hr style="border: none; border-top: 1px solid #E2E8F0; margin: 15px 0;">
+                <div style="background: #FEF2F2; border: 1px solid #FECACA; padding: 12px; border-radius: 6px; color: #DC2626; font-weight: bold; text-align: center; font-size: 15px;">
+                    ✅ 확보된 플레이스 최적화 점수 총합: {total_seo_score}점 상승
+                </div>
+            </div>
+        </div>
+
+        <!-- 두 번째 섹션: 1년 마케팅 솔루션 제안서 -->
+        <div class="report-card">
+            <div class="header-banner">
+                위드멤버 1년 마케팅 솔루션 제안서
+            </div>
+
+            <div class="section-title">[ 전문적인 마케팅 관리 솔루션 ]</div>
+            <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 25px;">
+                <div style="background: #F8FAFC; padding: 14px 18px; border: 1px solid #E2E8F0; border-radius: 6px; border-left: 5px solid #2563EB;">
+                    <div style="font-weight: bold; color: #2563EB; margin-bottom: 4px; font-size: 14px;">1. 네이버 플레이스 세팅 및 관리 (SEO최적화)</div>
+                    <div style="font-size: 13px; color: #475569;">- 단순 세팅을 넘어선 알고리즘 맞춤형 순위 최적화 및 지속 관리</div>
+                </div>
+                <div style="background: #F8FAFC; padding: 14px 18px; border: 1px solid #E2E8F0; border-radius: 6px; border-left: 5px solid #2563EB;">
+                    <div style="font-weight: bold; color: #2563EB; margin-bottom: 4px; font-size: 14px;">2. 맞춤형 블로그 체험단 운영</div>
+                    <div style="font-size: 13px; color: #475569;">- 매장 타겟층 정밀 분석을 통한 최적화 블로그 후보 검수 및 추천 배포</div>
+                </div>
+                <div style="background: #F8FAFC; padding: 14px 18px; border: 1px solid #E2E8F0; border-radius: 6px; border-left: 5px solid #2563EB;">
+                    <div style="font-weight: bold; color: #2563EB; margin-bottom: 4px; font-size: 14px;">3. 숏폼 영상 콘텐츠 기획 및 제작</div>
+                    <div style="font-size: 13px; color: #475569;">- 트렌디한 홍보 영상 제작 후 인스타그램 릴스 및 유튜브 쇼츠 배포</div>
+                </div>
+                <div style="background: #F8FAFC; padding: 14px 18px; border: 1px solid #E2E8F0; border-radius: 6px; border-left: 5px solid #2563EB;">
+                    <div style="font-weight: bold; color: #2563EB; margin-bottom: 4px; font-size: 14px;">4. 평점 및 리뷰 매니지먼트</div>
+                    <div style="font-size: 13px; color: #475569;">- 카카오맵 및 구글 맵스 고품질 리뷰 30건 구축으로 매장 신뢰도 극대화</div>
+                </div>
+            </div>
+
+            <div class="section-title">[ 3개월 뒤 예상 상승 매출액 및 추이 ]</div>
+            <div style="background: #FEF2F2; border: 1px solid #FECACA; padding: 16px; border-radius: 8px; text-align: center; color: #DC2626; font-size: 18px; font-weight: bold; margin-bottom: 20px;">
+                💰 총 예상 상승액: {rev_formatted} 원
+            </div>
             
-            img.paste(img_b, (90, card_y + 25))
-            img.paste(img_a, (650, card_y + 25))
-            
-            draw.rectangle([230, card_y + 595, 370, card_y + 635], fill="#F1F5F9")
-            draw.text((270, card_y + 602), "Before", font=font_bold, fill="#475569")
-            
-            draw.rectangle([790, card_y + 595, 930, card_y + 635], fill="#EFF6FF")
-            draw.text((833, card_y + 602), "After", font=font_bold, fill="#2563EB")
-        except Exception:
-            pass
-            
-    # 하단 요약 박스 (X: 60~1140, 폭 1080)
-    box_y = 925
-    draw.rectangle([60, box_y, 1140, box_y + 400], fill="white", outline="#CBD5E1", width=2)
-    draw.text((90, 955), "📌 위드멤버 플레이스 중점 관리 및 상승 내역", font=font_bold, fill="#0F172A")
-    
-    y_pos = 1020
-    details = [("기본 플레이스 SEO 최적화 및 정보 정비", "+30점", True)]
-    if use_b:
-        details.append(("네이버 예약 연동 (고객 편의성 및 체류 시간 증대)", "+12점", True))
-    if use_t:
-        details.append(("네이버 톡톡 응대 배너 적용 (실시간 소통 지수 반영)", "+10점", True))
-    if use_c:
-        details.append(("안심번호 등록 및 검색 노출 알고리즘 최적화", "+11점", True))
-        
-    for text, score, active in details:
-        draw.text((100, y_pos), f"• {text}", font=font_body, fill="#334155" if active else "#94A3B8")
-        draw.text((1000, y_pos), score, font=font_body, fill="#2563EB" if active else "#94A3B8")
-        y_pos += 46
-        
-    draw.line([(90, y_pos + 5), (1110, y_pos + 5)], fill="#E2E8F0", width=2)
-    
-    draw.rectangle([90, y_pos + 25, 1110, y_pos + 95], fill="#FEF2F2", outline="#FECACA", width=2)
-    draw.text((120, y_pos + 42), f"✅ 확보된 플레이스 최적화 점수 총합: {total_score}점 상승", font=font_badge, fill="#DC2626")
-    
-    buf = io.BytesIO()
-    img.save(buf, format="PNG")
-    return buf.getvalue()
+            <div style="background: #F8FAFC; border: 1px solid #E2E8F0; padding: 20px; border-radius: 8px; text-align: center;">
+                <svg viewBox="0 0 800 240" width="100%" height="100%" style="overflow: visible;">
+                    <line x1="80" y1="160" x2="740" y2="160" stroke="#CBD5E1" stroke-width="2" />
+                    <polyline fill="none" stroke="#2563EB" stroke-width="4" points="100,160 310,110 525,70 730,30" />
+                    <circle cx="100" cy="160" r="6" fill="#DC2626" stroke="white" stroke-width="2"/>
+                    <text x="100" y="195" font-size="13" fill="#475569" text-anchor="middle" font-weight="bold">관리 시작</text>
+                    
+                    <circle cx="310" cy="110" r="6" fill="#DC2626" stroke="white" stroke-width="2"/>
+                    <text x="310" y="85" font-size="14" fill="#2563EB" text-anchor="middle" font-weight="bold">{m1:,}만</text>
+                    <text x="310" y="195" font-size="13" fill="#475569" text-anchor="middle" font-weight="bold">1개월 차</text>
+                    
+                    <circle cx="525" cy="70" r="6" fill="#DC2626" stroke="white" stroke-width="2"/>
+                    <text x="525" y="45" font-size="14" fill="#2563EB" text-anchor="middle" font-weight="bold">{m2:,}만</text>
+                    <text x="525" y="195" font-size="13" fill="#475569" text-anchor="middle" font-weight="bold">2개월 차</text>
+                    
+                    <circle cx="730" cy="30" r="6" fill="#DC2626" stroke="white" stroke-width="2"/>
+                    <text x="730" y="5" font-size="14" fill="#2563EB" text-anchor="middle" font-weight="bold">{m3:,}만</text>
+                    <text x="730" y="195" font-size="13" fill="#475569" text-anchor="middle" font-weight="bold">3개월 차</text>
+                </svg>
+            </div>
+        </div>
+    </div>
+</div>
 
-def generate_solution_image(expected_revenue):
-    font_path = load_font()
-    img = Image.new('RGB', (1200, 1700), color="#F8FAFC")
-    draw = ImageDraw.Draw(img)
-    
-    try:
-        font_title = ImageFont.truetype(font_path, 40) if font_path else ImageFont.load_default()
-        font_sub = ImageFont.truetype(font_path, 26) if font_path else ImageFont.load_default()
-        font_body = ImageFont.truetype(font_path, 19) if font_path else ImageFont.load_default()
-        font_bold = ImageFont.truetype(font_path, 22) if font_path else ImageFont.load_default()
-        font_rev = ImageFont.truetype(font_path, 34) if font_path else ImageFont.load_default()
-    except:
-        font_title = font_sub = font_body = font_bold = font_rev = ImageFont.load_default()
+<script>
+function downloadFullReport() {{
+    const target = document.getElementById('capture-area');
+    html2canvas(target, {{ scale: 2, useCORS: true }F}).then(canvas => {{
+        const link = document.createElement('a');
+        link.download = '위드멤버_마케팅_통합보고서.png';
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+    }});
+}}
+</script>
 
-    # 상단 헤더 (높이 140, 수직 중앙 정렬)
-    draw.rectangle([0, 0, 1200, 140], fill="#0F172A")
-    draw.text((60, 48), "위드멤버 1년 마케팅 솔루션 제안서", font=font_title, fill="white")
-    
-    draw.text((60, 180), "[ 전문적인 마케팅 관리 솔루션 ]", font=font_sub, fill="#1E293B")
-    
-    services = [
-        ("1. 네이버 플레이스 세팅 및 관리 (SEO최적화)", "단순 세팅을 넘어선 알고리즘 맞춤형 순위 최적화 및 지속 관리"),
-        ("2. 맞춤형 블로그 체험단 운영", "매장 타겟층 정밀 분석을 통한 최적화 블로그 후보 검수 및 추천 배포"),
-        ("3. 숏폼 영상 콘텐츠 기획 및 제작", "트렌디한 홍보 영상 제작 후 인스타그램 릴스 및 유튜브 쇼츠 배포"),
-        ("4. 평점 및 리뷰 매니지먼트", "카카오맵 및 구글 맵스 고품질 리뷰 30건 구축으로 매장 신뢰도 극대화")
-    ]
-    
-    y = 240
-    for title, desc in services:
-        draw.rectangle([60, y, 1140, y + 90], fill="white", outline="#CBD5E1", width=2)
-        draw.rectangle([60, y, 74, y + 90], fill="#2563EB")
-        
-        draw.text((100, y + 16), title, font=font_bold, fill="#2563EB")
-        draw.text((100, y + 52), f"- {desc}", font=font_body, fill="#475569")
-        y += 105
-        
-    draw.line([(60, y + 15), (1140, y + 15)], fill="#CBD5E1", width=2)
-    y += 50
-    
-    draw.text((60, y), "[ 3개월 뒤 예상 상승 매출액 및 추이 ]", font=font_sub, fill="#1E293B")
-    y += 55
-    
-    draw.rectangle([60, y, 1140, y + 95], fill="#FEF2F2", outline="#FECACA", width=2)
-    rev_text = f"💰 총 예상 상승액: {expected_revenue:,} 원"
-    draw.text((360, y + 28), rev_text, font=font_rev, fill="#DC2626")
-    
-    y += 135
-    
-    # 그래프 영역 (X: 120~1080, 폭 960)
-    graph_x, graph_y = 120, y + 20
-    graph_w, graph_h = 960, 260
-    
-    draw.rectangle([60, y, 1140, y + graph_h + 90], fill="white", outline="#CBD5E1", width=2)
-    
-    draw.line([(graph_x, graph_y + graph_h), (graph_x + graph_w, graph_y + graph_h)], fill="#94A3B8", width=3)
-    
-    labels = ["관리 시작", "1개월 차", "2개월 차", "3개월 차"]
-    values = [0, expected_revenue * 0.25, expected_revenue * 0.60, expected_revenue]
-    
-    points = []
-    x_step = graph_w / 3
-    for i in range(4):
-        px = graph_x + (i * x_step)
-        py = (graph_y + graph_h) - (graph_h * (values[i] / expected_revenue))
-        points.append((px, py))
-        
-        draw.text((px - 35, graph_y + graph_h + 22), labels[i], font=font_body, fill="#475569")
-        
-        if i > 0:
-            val_text = f"{int(values[i]/10000):,}만"
-            draw.text((px - 32, py - 38), val_text, font=font_bold, fill="#2563EB")
+</body>
+</html>
+"""
 
-    draw.line(points, fill="#2563EB", width=5)
-    for p in points:
-        draw.ellipse([p[0]-8, p[1]-8, p[0]+8, p[1]+8], fill="#DC2626", outline="white", width=3)
-
-    buf = io.BytesIO()
-    img.save(buf, format="PNG")
-    return buf.getvalue()
-
-st.header("📥 분석 리포트 다운로드 (2종)")
-st.write("이미지가 업로드되면 다운로드 버튼이 활성화됩니다.")
-
-if before_img and after_img:
-    col_btn1, col_btn2 = st.columns(2)
-    
-    with col_btn1:
-        img1_bytes = generate_result_image(before_img, after_img, use_booking, use_talk, use_call, total_seo_score)
-        st.download_button(
-            label="1️⃣ 체험 결과 (Before/After) 이미지 다운로드",
-            data=img1_bytes,
-            file_name="1_위드멤버_결과보고.png",
-            mime="image/png"
-        )
-        
-    with col_btn2:
-        img2_bytes = generate_solution_image(st.session_state.expected_rev)
-        st.download_button(
-            label="2️⃣ 마케팅 솔루션 및 매출 그래프 다운로드",
-            data=img2_bytes,
-            file_name="2_위드멤버_솔루션제안.png",
-            mime="image/png"
-        )
-else:
-    st.warning("Before와 After 이미지를 모두 업로드해야 보고서를 다운로드할 수 있습니다.")
+st.components.v1.html(integrated_report_html, height=1350, scrolling=True)
