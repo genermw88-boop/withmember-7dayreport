@@ -35,7 +35,6 @@ def get_image_base64(uploaded_file):
 before_b64 = get_image_base64(before_file)
 after_b64 = get_image_base64(after_file)
 
-# 1번 리포트 이미지 영역: 첫 번째 요청의 빨간색 규격에 정확히 맞춤
 before_img_tag = f'<img src="{before_b64}" style="width: 100%; height: 100%; object-fit: cover; object-position: top; border-radius: 6px;" />' if before_b64 else '<span style="color: #94A3B8; font-size: 14px;">Before 이미지 미등록</span>'
 after_img_tag = f'<img src="{after_b64}" style="width: 100%; height: 100%; object-fit: cover; object-position: top; border-radius: 6px;" />' if after_b64 else '<span style="color: #94A3B8; font-size: 14px;">After 이미지 미등록</span>'
 
@@ -111,17 +110,14 @@ separate_reports_html = f"""
     </div>
 
 
-    <!-- [보고서 2] 1년 마케팅 솔루션 제안서 (두 번째 사진 빨간색 가이드라인 규격 완벽 반영) -->
+    <!-- [보고서 2] 1년 마케팅 솔루션 제안서 (상단 타이틀 삭제 및 5번 항목 추가, 화살표 형태 추이 그래프 반영) -->
     <div class="download-bar">
         <button class="download-btn" onclick="downloadReport('report-2', '위드멤버_1년마케팅솔루션_제안서.png')">📥 1년 마케팅 솔루션 제안서 저장</button>
     </div>
 
     <div id="report-2" class="report-card">
-        <div class="header-banner">
-            위드멤버 1년 마케팅 솔루션 제안서
-        </div>
-
-        <div class="section-title">[ 전문적인 마케팅 관리 솔루션 ]</div>
+        
+        <div class="section-title" style="margin-top: 0;">[ 전문적인 마케팅 관리 솔루션 ]</div>
         <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 25px;">
             <div style="background: #F8FAFC; padding: 14px 18px; border: 1px solid #E2E8F0; border-radius: 6px; border-left: 5px solid #2563EB;">
                 <div style="font-weight: bold; color: #2563EB; margin-bottom: 4px; font-size: 14px;">1. 네이버 플레이스 세팅 및 관리 (SEO최적화)</div>
@@ -139,20 +135,39 @@ separate_reports_html = f"""
                 <div style="font-weight: bold; color: #2563EB; margin-bottom: 4px; font-size: 14px;">4. 평점 및 리뷰 매니지먼트</div>
                 <div style="font-size: 13px; color: #475569;">- 카카오맵 및 구글 맵스 고품질 리뷰 30건 구축으로 매장 신뢰도 극대화</div>
             </div>
+            <div style="background: #F8FAFC; padding: 14px 18px; border: 1px solid #E2E8F0; border-radius: 6px; border-left: 5px solid #2563EB;">
+                <div style="font-weight: bold; color: #2563EB; margin-bottom: 4px; font-size: 14px;">5. 트래픽 작업을 통한 플레이스 순위 상승</div>
+                <div style="font-size: 13px; color: #475569;">- 실사용자 패턴 기반 맞춤형 유입 트래픽 제어로 네이버 알고리즘 상위 노출 극대화</div>
+            </div>
         </div>
 
         <div class="section-title">[ 3개월 뒤 예상 상승 매출액 및 추이 ]</div>
         
-        <!-- [수정완료] 두 번째 사진 첫 번째 빨간색 박스 규격에 맞게 패딩과 마진 최적화 -->
         <div style="background: #FEF2F2; border: 1px solid #FECACA; padding: 14px 18px; border-radius: 6px; text-align: center; color: #DC2626; font-size: 18px; font-weight: bold; margin-bottom: 15px; width: 100%; box-sizing: border-box;">
             💰 총 예상 상승액: {rev_formatted} 원
         </div>
         
-        <!-- [수정완료] 두 번째 사진 두 번째 빨간색 박스 규격에 정확히 맞춘 그래프 영역 -->
+        <!-- [수정완료] 요청하신 빨간색 화살표 모양(급상승 수직 상승 형태)이 적용된 추이 그래프 영역 -->
         <div style="background: #F8FAFC; border: 1px solid #E2E8F0; padding: 20px 25px 15px 25px; border-radius: 6px; text-align: center; width: 100%; box-sizing: border-box;">
             <svg viewBox="0 0 800 220" width="100%" height="100%" style="overflow: visible;">
+                <defs>
+                    <marker id="red-arrow" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                        <path d="M 0 2 L 10 5 L 0 8 z" fill="#DC2626"/>
+                    </marker>
+                    <marker id="red-arrow-right" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                        <path d="M 0 2 L 10 5 L 0 8 z" fill="#DC2626"/>
+                    </marker>
+                </defs>
+                
+                <!-- 기준 회색 배경선 -->
                 <line x1="80" y1="180" x2="740" y2="35" stroke="#CBD5E1" stroke-width="2" />
+                
+                <!-- 파란색 실적 선 -->
                 <polyline fill="none" stroke="#2563EB" stroke-width="4" points="100,175 310,128 525,81 730,35" />
+                
+                <!-- 요청하신 화살표 모양 대로 출력되도록 구현된 빨간색 가이드/상승 화살표 -->
+                <line x1="80" y1="180" x2="735" y2="38" stroke="#DC2626" stroke-width="3" marker-end="url(#red-arrow)" />
+                <line x1="80" y1="180" x2="775" y2="180" stroke="#DC2626" stroke-width="3" marker-end="url(#red-arrow-right)" />
                 
                 <circle cx="100" cy="175" r="6" fill="#DC2626" stroke="white" stroke-width="2"/>
                 <text x="100" y="205" font-size="13" fill="#475569" text-anchor="middle" font-weight="bold">관리 시작</text>
