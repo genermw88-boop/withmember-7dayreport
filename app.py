@@ -35,9 +35,9 @@ def get_image_base64(uploaded_file):
 before_b64 = get_image_base64(before_file)
 after_b64 = get_image_base64(after_file)
 
-# 1번 이미지 비율 유지 (object-fit: contain 및 백그라운드 여백 정렬)
-before_img_tag = f'<img src="{before_b64}" style="max-width: 100%; max-height: 100%; object-fit: contain; border-radius: 6px;" />' if before_b64 else '<span style="color: #94A3B8; font-size: 14px;">Before 이미지 미등록</span>'
-after_img_tag = f'<img src="{after_b64}" style="max-width: 100%; max-height: 100%; object-fit: contain; border-radius: 6px;" />' if after_b64 else '<span style="color: #94A3B8; font-size: 14px;">After 이미지 미등록</span>'
+# 1번 이미지 영역: 빨간색 규격(모바일 캡처 비율 9:19)에 정확히 맞추고 왜곡 방지
+before_img_tag = f'<img src="{before_b64}" style="width: 100%; height: 100%; object-fit: cover; object-position: top; border-radius: 6px;" />' if before_b64 else '<span style="color: #94A3B8; font-size: 14px;">Before 이미지 미등록</span>'
+after_img_tag = f'<img src="{after_b64}" style="width: 100%; height: 100%; object-fit: cover; object-position: top; border-radius: 6px;" />' if after_b64 else '<span style="color: #94A3B8; font-size: 14px;">After 이미지 미등록</span>'
 
 details_html = ""
 if use_booking:
@@ -85,18 +85,18 @@ separate_reports_html = f"""
         </div>
         
         <div class="section-title">[ 네이버 플레이스 개선 Before & After ]</div>
-        <div style="display: flex; gap: 15px; justify-content: center; margin-bottom: 25px;">
+        <div style="display: flex; gap: 20px; justify-content: center; margin-bottom: 25px;">
             <div style="flex: 1; text-align: center; background: #F8FAFC; padding: 15px; border-radius: 8px; border: 1px solid #E2E8F0;">
-                <div style="height: 480px; display: flex; align-items: center; justify-content: center; margin-bottom: 10px; overflow: hidden;">
+                <div style="width: 100%; height: 580px; display: flex; align-items: center; justify-content: center; margin-bottom: 10px; overflow: hidden; background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 6px;">
                     {before_img_tag}
                 </div>
-                <div style="display: inline-block; background: #F1F5F9; padding: 4px 16px; border-radius: 4px; font-weight: bold; color: #475569; font-size: 13px;">Before</div>
+                <div style="display: inline-block; background: #F1F5F9; padding: 4px 16px; border-radius: 4px; font-weight: bold; color: #475569; font-size: 13px; margin-top: 5px;">Before</div>
             </div>
             <div style="flex: 1; text-align: center; background: #F8FAFC; padding: 15px; border-radius: 8px; border: 1px solid #E2E8F0;">
-                <div style="height: 480px; display: flex; align-items: center; justify-content: center; margin-bottom: 10px; overflow: hidden;">
+                <div style="width: 100%; height: 580px; display: flex; align-items: center; justify-content: center; margin-bottom: 10px; overflow: hidden; background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 6px;">
                     {after_img_tag}
                 </div>
-                <div style="display: inline-block; background: #EFF6FF; padding: 4px 16px; border-radius: 4px; font-weight: bold; color: #2563EB; font-size: 13px;">After</div>
+                <div style="display: inline-block; background: #EFF6FF; padding: 4px 16px; border-radius: 4px; font-weight: bold; color: #2563EB; font-size: 13px; margin-top: 5px;">After</div>
             </div>
         </div>
 
@@ -146,25 +146,26 @@ separate_reports_html = f"""
             💰 총 예상 상승액: {rev_formatted} 원
         </div>
         
+        <!-- 그래프 영역: 선의 각도 및 텍스트 위치를 빨간색 가이드라인에 완벽히 일치시키도록 수정 -->
         <div style="background: #F8FAFC; border: 1px solid #E2E8F0; padding: 25px; border-radius: 8px; text-align: center;">
             <svg viewBox="0 0 800 240" width="100%" height="100%" style="overflow: visible;">
-                <line x1="80" y1="160" x2="740" y2="160" stroke="#CBD5E1" stroke-width="2" />
-                <polyline fill="none" stroke="#2563EB" stroke-width="4" points="100,160 310,110 525,70 730,30" />
+                <line x1="80" y1="200" x2="740" y2="40" stroke="#CBD5E1" stroke-width="2" />
+                <polyline fill="none" stroke="#2563EB" stroke-width="4" points="100,195 310,143 525,92 730,40" />
                 
-                <circle cx="100" cy="160" r="6" fill="#DC2626" stroke="white" stroke-width="2"/>
-                <text x="100" y="195" font-size="13" fill="#475569" text-anchor="middle" font-weight="bold">관리 시작</text>
+                <circle cx="100" cy="195" r="6" fill="#DC2626" stroke="white" stroke-width="2"/>
+                <text x="100" y="225" font-size="13" fill="#475569" text-anchor="middle" font-weight="bold">관리 시작</text>
                 
-                <circle cx="310" cy="110" r="6" fill="#DC2626" stroke="white" stroke-width="2"/>
-                <text x="310" y="90" font-size="14" fill="#2563EB" text-anchor="middle" font-weight="bold">{m1:,}만</text>
-                <text x="310" y="195" font-size="13" fill="#475569" text-anchor="middle" font-weight="bold">1개월 차</text>
+                <circle cx="310" cy="143" r="6" fill="#DC2626" stroke="white" stroke-width="2"/>
+                <text x="310" y="125" font-size="14" fill="#2563EB" text-anchor="middle" font-weight="bold">{m1:,}만</text>
+                <text x="310" y="225" font-size="13" fill="#475569" text-anchor="middle" font-weight="bold">1개월 차</text>
                 
-                <circle cx="525" cy="70" r="6" fill="#DC2626" stroke="white" stroke-width="2"/>
-                <text x="525" y="50" font-size="14" fill="#2563EB" text-anchor="middle" font-weight="bold">{m2:,}만</text>
-                <text x="525" y="195" font-size="13" fill="#475569" text-anchor="middle" font-weight="bold">2개월 차</text>
+                <circle cx="525" cy="92" r="6" fill="#DC2626" stroke="white" stroke-width="2"/>
+                <text x="525" y="74" font-size="14" fill="#2563EB" text-anchor="middle" font-weight="bold">{m2:,}만</text>
+                <text x="525" y="225" font-size="13" fill="#475569" text-anchor="middle" font-weight="bold">2개월 차</text>
                 
-                <circle cx="730" cy="30" r="6" fill="#DC2626" stroke="white" stroke-width="2"/>
-                <text x="730" y="10" font-size="14" fill="#2563EB" text-anchor="middle" font-weight="bold">{m3:,}만</text>
-                <text x="730" y="195" font-size="13" fill="#475569" text-anchor="middle" font-weight="bold">3개월 차</text>
+                <circle cx="730" cy="40" r="6" fill="#DC2626" stroke="white" stroke-width="2"/>
+                <text x="730" y="22" font-size="14" fill="#2563EB" text-anchor="middle" font-weight="bold">{m3:,}만</text>
+                <text x="730" y="225" font-size="13" fill="#475569" text-anchor="middle" font-weight="bold">3개월 차</text>
             </svg>
         </div>
     </div>
@@ -187,4 +188,4 @@ function downloadReport(elementId, filename) {{
 </html>
 """
 
-st.components.v1.html(separate_reports_html, height=1950, scrolling=True)
+st.components.v1.html(separate_reports_html, height=2050, scrolling=True)
