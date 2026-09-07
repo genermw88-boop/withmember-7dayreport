@@ -4,6 +4,7 @@ import base64
 
 st.set_page_config(page_title="위드멤버 마케팅 보고서 & 솔루션 시스템", layout="wide")
 
+# 3개월 뒤 예상 매출액을 1,500만 원 ~ 2,000만 원 사이의 랜덤 값으로 설정 (세션에 없을 경우에만 생성)
 if 'expected_rev' not in st.session_state:
     st.session_state.expected_rev = random.randint(1500, 2000) * 10000
 
@@ -52,7 +53,6 @@ def get_image_base64(uploaded_file):
 before_b64 = get_image_base64(before_file)
 after_b64 = get_image_base64(after_file)
 
-# 요청하신 빨간색 세로형 규격에 맞추어 contain 속성 적용 및 비율 조정
 before_img_tag = f'<img src="{before_b64}" style="max-width: 100%; max-height: 100%; object-fit: contain; border-radius: 6px;" />' if before_b64 else '<span style="color: #94A3B8; font-size: 14px;">Before 이미지 미등록</span>'
 after_img_tag = f'<img src="{after_b64}" style="max-width: 100%; max-height: 100%; object-fit: contain; border-radius: 6px;" />' if after_b64 else '<span style="color: #94A3B8; font-size: 14px;">After 이미지 미등록</span>'
 
@@ -71,6 +71,7 @@ if use_keyword:
 rev = st.session_state.expected_rev
 rev_formatted = f"{rev:,}"
 
+# 그래프 단계별 매출액 자동 배분 (1개월 차: 약 15%, 2개월 차: 약 45%, 3개월 차: 최종 목표액)
 m1 = int(rev * 0.15 / 10000)
 m2 = int(rev * 0.45 / 10000)
 m3 = int(rev / 10000)
