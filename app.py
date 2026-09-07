@@ -35,7 +35,7 @@ def get_image_base64(uploaded_file):
 before_b64 = get_image_base64(before_file)
 after_b64 = get_image_base64(after_file)
 
-# 1번 이미지 영역: 빨간색 규격(모바일 캡처 비율 9:19)에 정확히 맞추고 왜곡 방지
+# 1번 리포트 이미지 영역: 첫 번째 요청의 빨간색 규격에 정확히 맞춤
 before_img_tag = f'<img src="{before_b64}" style="width: 100%; height: 100%; object-fit: cover; object-position: top; border-radius: 6px;" />' if before_b64 else '<span style="color: #94A3B8; font-size: 14px;">Before 이미지 미등록</span>'
 after_img_tag = f'<img src="{after_b64}" style="width: 100%; height: 100%; object-fit: cover; object-position: top; border-radius: 6px;" />' if after_b64 else '<span style="color: #94A3B8; font-size: 14px;">After 이미지 미등록</span>'
 
@@ -111,7 +111,7 @@ separate_reports_html = f"""
     </div>
 
 
-    <!-- [보고서 2] 1년 마케팅 솔루션 제안서 -->
+    <!-- [보고서 2] 1년 마케팅 솔루션 제안서 (두 번째 사진 빨간색 가이드라인 규격 완벽 반영) -->
     <div class="download-bar">
         <button class="download-btn" onclick="downloadReport('report-2', '위드멤버_1년마케팅솔루션_제안서.png')">📥 1년 마케팅 솔루션 제안서 저장</button>
     </div>
@@ -142,30 +142,32 @@ separate_reports_html = f"""
         </div>
 
         <div class="section-title">[ 3개월 뒤 예상 상승 매출액 및 추이 ]</div>
-        <div style="background: #FEF2F2; border: 1px solid #FECACA; padding: 18px; border-radius: 8px; text-align: center; color: #DC2626; font-size: 19px; font-weight: bold; margin-bottom: 20px;">
+        
+        <!-- [수정완료] 두 번째 사진 첫 번째 빨간색 박스 규격에 맞게 패딩과 마진 최적화 -->
+        <div style="background: #FEF2F2; border: 1px solid #FECACA; padding: 14px 18px; border-radius: 6px; text-align: center; color: #DC2626; font-size: 18px; font-weight: bold; margin-bottom: 15px; width: 100%; box-sizing: border-box;">
             💰 총 예상 상승액: {rev_formatted} 원
         </div>
         
-        <!-- 그래프 영역: 선의 각도 및 텍스트 위치를 빨간색 가이드라인에 완벽히 일치시키도록 수정 -->
-        <div style="background: #F8FAFC; border: 1px solid #E2E8F0; padding: 25px; border-radius: 8px; text-align: center;">
-            <svg viewBox="0 0 800 240" width="100%" height="100%" style="overflow: visible;">
-                <line x1="80" y1="200" x2="740" y2="40" stroke="#CBD5E1" stroke-width="2" />
-                <polyline fill="none" stroke="#2563EB" stroke-width="4" points="100,195 310,143 525,92 730,40" />
+        <!-- [수정완료] 두 번째 사진 두 번째 빨간색 박스 규격에 정확히 맞춘 그래프 영역 -->
+        <div style="background: #F8FAFC; border: 1px solid #E2E8F0; padding: 20px 25px 15px 25px; border-radius: 6px; text-align: center; width: 100%; box-sizing: border-box;">
+            <svg viewBox="0 0 800 220" width="100%" height="100%" style="overflow: visible;">
+                <line x1="80" y1="180" x2="740" y2="35" stroke="#CBD5E1" stroke-width="2" />
+                <polyline fill="none" stroke="#2563EB" stroke-width="4" points="100,175 310,128 525,81 730,35" />
                 
-                <circle cx="100" cy="195" r="6" fill="#DC2626" stroke="white" stroke-width="2"/>
-                <text x="100" y="225" font-size="13" fill="#475569" text-anchor="middle" font-weight="bold">관리 시작</text>
+                <circle cx="100" cy="175" r="6" fill="#DC2626" stroke="white" stroke-width="2"/>
+                <text x="100" y="205" font-size="13" fill="#475569" text-anchor="middle" font-weight="bold">관리 시작</text>
                 
-                <circle cx="310" cy="143" r="6" fill="#DC2626" stroke="white" stroke-width="2"/>
-                <text x="310" y="125" font-size="14" fill="#2563EB" text-anchor="middle" font-weight="bold">{m1:,}만</text>
-                <text x="310" y="225" font-size="13" fill="#475569" text-anchor="middle" font-weight="bold">1개월 차</text>
+                <circle cx="310" cy="128" r="6" fill="#DC2626" stroke="white" stroke-width="2"/>
+                <text x="310" y="110" font-size="14" fill="#2563EB" text-anchor="middle" font-weight="bold">{m1:,}만</text>
+                <text x="310" y="205" font-size="13" fill="#475569" text-anchor="middle" font-weight="bold">1개월 차</text>
                 
-                <circle cx="525" cy="92" r="6" fill="#DC2626" stroke="white" stroke-width="2"/>
-                <text x="525" y="74" font-size="14" fill="#2563EB" text-anchor="middle" font-weight="bold">{m2:,}만</text>
-                <text x="525" y="225" font-size="13" fill="#475569" text-anchor="middle" font-weight="bold">2개월 차</text>
+                <circle cx="525" cy="81" r="6" fill="#DC2626" stroke="white" stroke-width="2"/>
+                <text x="525" y="63" font-size="14" fill="#2563EB" text-anchor="middle" font-weight="bold">{m2:,}만</text>
+                <text x="525" y="205" font-size="13" fill="#475569" text-anchor="middle" font-weight="bold">2개월 차</text>
                 
-                <circle cx="730" cy="40" r="6" fill="#DC2626" stroke="white" stroke-width="2"/>
-                <text x="730" y="22" font-size="14" fill="#2563EB" text-anchor="middle" font-weight="bold">{m3:,}만</text>
-                <text x="730" y="225" font-size="13" fill="#475569" text-anchor="middle" font-weight="bold">3개월 차</text>
+                <circle cx="730" cy="35" r="6" fill="#DC2626" stroke="white" stroke-width="2"/>
+                <text x="730" y="17" font-size="14" fill="#2563EB" text-anchor="middle" font-weight="bold">{m3:,}만</text>
+                <text x="730" y="205" font-size="13" fill="#475569" text-anchor="middle" font-weight="bold">3개월 차</text>
             </svg>
         </div>
     </div>
