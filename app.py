@@ -48,8 +48,10 @@ if use_call:
 
 rev = st.session_state.expected_rev
 rev_formatted = f"{rev:,}"
-m1 = int(rev * 0.25 / 10000)
-m2 = int(rev * 0.60 / 10000)
+
+# 빨간 선의 기울기(초반엔 완만하다가 후반에 폭발적으로 증가하는 J커브 형태)에 맞춘 월별 매출액 배분
+m1 = int(rev * 0.15 / 10000)
+m2 = int(rev * 0.45 / 10000)
 m3 = int(rev / 10000)
 
 separate_reports_html = f"""
@@ -110,7 +112,7 @@ separate_reports_html = f"""
     </div>
 
 
-    <!-- [보고서 2] 1년 마케팅 솔루션 제안서 (상단 타이틀 삭제 및 5번 항목 추가, 화살표 형태 추이 그래프 반영) -->
+    <!-- [보고서 2] 1년 마케팅 솔루션 제안서 -->
     <div class="download-bar">
         <button class="download-btn" onclick="downloadReport('report-2', '위드멤버_1년마케팅솔루션_제안서.png')">📥 1년 마케팅 솔루션 제안서 저장</button>
     </div>
@@ -147,41 +149,30 @@ separate_reports_html = f"""
             💰 총 예상 상승액: {rev_formatted} 원
         </div>
         
-        <!-- [수정완료] 요청하신 빨간색 화살표 모양(급상승 수직 상승 형태)이 적용된 추이 그래프 영역 -->
+        <!-- [수정완료] 요청하신 빨간 선(J커브 형태의 급상승 곡선) 모양대로 매출액 그래프 선을 완벽히 일치시킴 -->
         <div style="background: #F8FAFC; border: 1px solid #E2E8F0; padding: 20px 25px 15px 25px; border-radius: 6px; text-align: center; width: 100%; box-sizing: border-box;">
             <svg viewBox="0 0 800 220" width="100%" height="100%" style="overflow: visible;">
-                <defs>
-                    <marker id="red-arrow" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-                        <path d="M 0 2 L 10 5 L 0 8 z" fill="#DC2626"/>
-                    </marker>
-                    <marker id="red-arrow-right" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-                        <path d="M 0 2 L 10 5 L 0 8 z" fill="#DC2626"/>
-                    </marker>
-                </defs>
                 
-                <!-- 기준 회색 배경선 -->
-                <line x1="80" y1="180" x2="740" y2="35" stroke="#CBD5E1" stroke-width="2" />
+                <!-- 참고용 배경 그리드 라인 -->
+                <line x1="100" y1="175" x2="730" y2="35" stroke="#E2E8F0" stroke-width="1.5" stroke-dasharray="4,4" />
                 
-                <!-- 파란색 실적 선 -->
-                <polyline fill="none" stroke="#2563EB" stroke-width="4" points="100,175 310,128 525,81 730,35" />
+                <!-- 요청하신 빨간 선 모양(초반 완만 후 후반 급상승하는 J커브 궤적)을 그대로 반영한 매출액 상승 곡선 (path 베지에 곡선 활용) -->
+                <path d="M 100,175 Q 400,165 730,35" fill="none" stroke="#DC2626" stroke-width="4" />
                 
-                <!-- 요청하신 화살표 모양 대로 출력되도록 구현된 빨간색 가이드/상승 화살표 -->
-                <line x1="80" y1="180" x2="735" y2="38" stroke="#DC2626" stroke-width="3" marker-end="url(#red-arrow)" />
-                <line x1="80" y1="180" x2="775" y2="180" stroke="#DC2626" stroke-width="3" marker-end="url(#red-arrow-right)" />
-                
+                <!-- 각 포인트 및 텍스트 레이아웃 -->
                 <circle cx="100" cy="175" r="6" fill="#DC2626" stroke="white" stroke-width="2"/>
                 <text x="100" y="205" font-size="13" fill="#475569" text-anchor="middle" font-weight="bold">관리 시작</text>
                 
-                <circle cx="310" cy="128" r="6" fill="#DC2626" stroke="white" stroke-width="2"/>
-                <text x="310" y="110" font-size="14" fill="#2563EB" text-anchor="middle" font-weight="bold">{m1:,}만</text>
+                <circle cx="310" cy="160" r="6" fill="#DC2626" stroke="white" stroke-width="2"/>
+                <text x="310" y="142" font-size="14" fill="#DC2626" text-anchor="middle" font-weight="bold">{m1:,}만</text>
                 <text x="310" y="205" font-size="13" fill="#475569" text-anchor="middle" font-weight="bold">1개월 차</text>
                 
-                <circle cx="525" cy="81" r="6" fill="#DC2626" stroke="white" stroke-width="2"/>
-                <text x="525" y="63" font-size="14" fill="#2563EB" text-anchor="middle" font-weight="bold">{m2:,}만</text>
+                <circle cx="525" cy="115" r="6" fill="#DC2626" stroke="white" stroke-width="2"/>
+                <text x="525" y="97" font-size="14" fill="#DC2626" text-anchor="middle" font-weight="bold">{m2:,}만</text>
                 <text x="525" y="205" font-size="13" fill="#475569" text-anchor="middle" font-weight="bold">2개월 차</text>
                 
                 <circle cx="730" cy="35" r="6" fill="#DC2626" stroke="white" stroke-width="2"/>
-                <text x="730" y="17" font-size="14" fill="#2563EB" text-anchor="middle" font-weight="bold">{m3:,}만</text>
+                <text x="730" y="17" font-size="14" fill="#DC2626" text-anchor="middle" font-weight="bold">{m3:,}만</text>
                 <text x="730" y="205" font-size="13" fill="#475569" text-anchor="middle" font-weight="bold">3개월 차</text>
             </svg>
         </div>
