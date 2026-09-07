@@ -4,7 +4,7 @@ import base64
 
 st.set_page_config(page_title="위드멤버 마케팅 보고서 & 솔루션 시스템", layout="wide")
 
-# 3개월 뒤 예상 매출액을 1,500만 원 ~ 2,000만 원 사이의 랜덤 값으로 설정 (세션에 없을 경우에만 생성)
+# 세션 상태 초기화 (페이지 새로고침 시 1회 랜덤 값 부여)
 if 'expected_rev' not in st.session_state:
     st.session_state.expected_rev = random.randint(1500, 2000) * 10000
 
@@ -18,6 +18,9 @@ if 'score_news' not in st.session_state:
     st.session_state.score_news = random.randint(10, 15)
 if 'score_keyword' not in st.session_state:
     st.session_state.score_keyword = random.randint(12, 18)
+# 네이버 쿠폰 항목 랜덤 점수 추가 (예: 8점 ~ 14점)
+if 'score_coupon' not in st.session_state:
+    st.session_state.score_coupon = random.randint(8, 14)
 
 st.title("📊 위드멤버 마케팅 보고서 & 1년 솔루션 분리 출력 시스템")
 st.markdown("---")
@@ -34,14 +37,16 @@ use_talk = st.sidebar.checkbox(f"네이버 톡톡 응대 배너 적용 (+{st.ses
 use_call = st.sidebar.checkbox(f"안심번호 등록 및 키워드 최적화 (+{st.session_state.score_call}점)", value=True)
 use_news = st.sidebar.checkbox(f"플레이스 새소식 업데이트 (+{st.session_state.score_news}점)", value=True)
 use_keyword = st.sidebar.checkbox(f"플레이스 메인키워드 수정 (+{st.session_state.score_keyword}점)", value=True)
+use_coupon = st.sidebar.checkbox(f"네이버 쿠폰 등록 및 세팅 (+{st.session_state.score_coupon}점)", value=True)
 
 score_booking_val = st.session_state.score_booking if use_booking else 0
 score_talk_val = st.session_state.score_talk if use_talk else 0
 score_call_val = st.session_state.score_call if use_call else 0
 score_news_val = st.session_state.score_news if use_news else 0
 score_keyword_val = st.session_state.score_keyword if use_keyword else 0
+score_coupon_val = st.session_state.score_coupon if use_coupon else 0
 
-total_seo_score = score_booking_val + score_talk_val + score_call_val + score_news_val + score_keyword_val
+total_seo_score = score_booking_val + score_talk_val + score_call_val + score_news_val + score_keyword_val + score_coupon_val
 
 def get_image_base64(uploaded_file):
     if uploaded_file is not None:
@@ -67,11 +72,12 @@ if use_news:
     details_html += f'<div style="display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 14px;"><span style="color: #334155;">• 플레이스 새소식 업데이트 (활성화 지수 및 최신성 확보)</span><span style="color: #2563EB; font-weight: bold;">+{score_news_val}점</span></div>'
 if use_keyword:
     details_html += f'<div style="display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 14px;"><span style="color: #334155;">• 플레이스 메인키워드 수정 (타겟 검색 유입 극대화)</span><span style="color: #2563EB; font-weight: bold;">+{score_keyword_val}점</span></div>'
+if use_coupon:
+    details_html += f'<div style="display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 14px;"><span style="color: #334155;">• 네이버 쿠폰 등록 및 세팅 (방문 전환율 및 혜택 노출 강화)</span><span style="color: #2563EB; font-weight: bold;">+{score_coupon_val}점</span></div>'
 
 rev = st.session_state.expected_rev
 rev_formatted = f"{rev:,}"
 
-# 그래프 단계별 매출액 자동 배분 (1개월 차: 약 15%, 2개월 차: 약 45%, 3개월 차: 최종 목표액)
 m1 = int(rev * 0.15 / 10000)
 m2 = int(rev * 0.45 / 10000)
 m3 = int(rev / 10000)
