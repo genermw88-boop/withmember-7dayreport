@@ -6,7 +6,6 @@ import os
 import urllib.request
 from PIL import Image, ImageDraw, ImageFont
 
-# 폰트 다운로드 (안정적인 URL 사용)
 @st.cache_resource
 def load_font():
     font_path = "NanumGothic.ttf"
@@ -14,12 +13,10 @@ def load_font():
         try:
             url = "https://raw.githubusercontent.com/google/fonts/main/ofl/nanumgothic/NanumGothic-Regular.ttf"
             urllib.request.urlretrieve(url, font_path)
-        except Exception as e:
-            st.warning("웹 폰트 로드에 실패했습니다.")
+        except Exception:
             return None
     return font_path
 
-# 이미지 비율 유지 리사이징 함수 (여백 포함 고품질 패딩)
 def resize_with_aspect_ratio(image, target_width, target_height):
     img_ratio = image.width / image.height
     target_ratio = target_width / target_height
@@ -40,10 +37,8 @@ def resize_with_aspect_ratio(image, target_width, target_height):
     offset_x = (target_width - new_width) // 2
     offset_y = (target_height - new_height) // 2
     new_image.paste(resized_img, (offset_x, offset_y))
-    
     return new_image
 
-# 페이지 기본 설정
 st.set_page_config(page_title="위드멤버 결과 보고 및 솔루션 제안", layout="wide")
 
 if 'expected_rev' not in st.session_state:
@@ -52,9 +47,7 @@ if 'expected_rev' not in st.session_state:
 st.title("📊 1주 무료체험 결과 및 솔루션 제안")
 st.markdown("---")
 
-# 1. 플레이스 Before & After 및 관리 항목 설정
 st.header("1. 네이버 플레이스 개선 Before & After & 관리 항목 세팅")
-
 col_set1, col_set2 = st.columns(2)
 with col_set1:
     before_img = st.file_uploader("Before 이미지를 업로드하세요", type=['png', 'jpg', 'jpeg'])
@@ -80,7 +73,6 @@ total_seo_score = base_score + score_booking + score_talk + score_call
 st.info(f"💡 **현재 적용된 총 최적화 상승 점수:** **{total_seo_score}점** 상승")
 st.markdown("---")
 
-# 2. 위드멤버 1년 마케팅 솔루션
 st.header("2. 위드멤버 1년 마케팅 솔루션")
 st.markdown("""
 * **네이버 플레이스 세팅 및 관리 (SEO최적화):** 단순 세팅을 넘어선 알고리즘 맞춤형 순위 최적화 및 지속 관리
@@ -90,42 +82,36 @@ st.markdown("""
 """)
 st.markdown("---")
 
-# 3. 예상 매출 상승
 st.header("3. 3개월 뒤 예상 상승 매출액")
 st.write(f"예상 상승 매출액: **{st.session_state.expected_rev:,}원**")
 
-# === [전문 에이전시급 1번 이미지 생성 함수] ===
 def generate_result_image(before_upload, after_upload, use_b, use_t, use_c, total_score):
     font_path = load_font()
-    # 고해상도 규격 (1200 x 1600)
-    img = Image.new('RGB', (1200, 1600), color="#F8FAFC")
+    img = Image.new('RGB', (1200, 1650), color="#F8FAFC")
     draw = ImageDraw.Draw(img)
     
     try:
-        font_title = ImageFont.truetype(font_path, 42) if font_path else ImageFont.load_default()
-        font_sub = ImageFont.truetype(font_path, 28) if font_path else ImageFont.load_default()
-        font_body = ImageFont.truetype(font_path, 22) if font_path else ImageFont.load_default()
-        font_bold = ImageFont.truetype(font_path, 24) if font_path else ImageFont.load_default()
-        font_badge = ImageFont.truetype(font_path, 26) if font_path else ImageFont.load_default()
+        font_title = ImageFont.truetype(font_path, 40) if font_path else ImageFont.load_default()
+        font_sub = ImageFont.truetype(font_path, 26) if font_path else ImageFont.load_default()
+        font_body = ImageFont.truetype(font_path, 20) if font_path else ImageFont.load_default()
+        font_bold = ImageFont.truetype(font_path, 22) if font_path else ImageFont.load_default()
+        font_badge = ImageFont.truetype(font_path, 24) if font_path else ImageFont.load_default()
     except:
         font_title = font_sub = font_body = font_bold = font_badge = ImageFont.load_default()
 
-    # 1. 상단 다크 네이비 프리미엄 헤더 바
-    draw.rectangle([0, 0, 1200, 130], fill="#0F172A")
-    draw.text((60, 42), "위드멤버 1주 무료체험 결과 요약 보고서", font=font_title, fill="white")
+    # 상단 헤더 (높이 140, 수직 중앙 정렬)
+    draw.rectangle([0, 0, 1200, 140], fill="#0F172A")
+    draw.text((60, 48), "위드멤버 1주 무료체험 결과 요약 보고서", font=font_title, fill="white")
     
-    # 2. 섹션 타이틀
-    draw.text((60, 165), "[ 네이버 플레이스 개선 Before & After ]", font=font_sub, fill="#1E293B")
+    draw.text((60, 180), "[ 네이버 플레이스 개선 Before & After ]", font=font_sub, fill="#1E293B")
     
-    # 3. Before / After 카드 컨테이너 배치 (각 폭 520, 높이 680)
-    card_y = 220
+    # 카드 영역 (폭 520, 높이 660, X좌표: 60 및 620)
+    card_y = 230
     card_w = 520
-    card_h = 680
+    card_h = 660
     
-    # Before 카드 배경 및 테두리
-    draw.rectangle([60, card_y, 60 + card_w, card_y + card_h], fill="white", outline="#E2E8F0", width=2)
-    # After 카드 배경 및 테두리
-    draw.rectangle([620, card_y, 620 + card_w, card_y + card_h], fill="white", outline="#E2E8F0", width=2)
+    draw.rectangle([60, card_y, 60 + card_w, card_y + card_h], fill="white", outline="#CBD5E1", width=2)
+    draw.rectangle([620, card_y, 620 + card_w, card_y + card_h], fill="white", outline="#CBD5E1", width=2)
     
     if before_upload and after_upload:
         try:
@@ -134,28 +120,26 @@ def generate_result_image(before_upload, after_upload, use_b, use_t, use_c, tota
             img_b = Image.open(before_upload).convert("RGB")
             img_a = Image.open(after_upload).convert("RGB")
             
-            # 카드 내부 스크린샷 최적화 크기 (460 x 580)
-            img_b = resize_with_aspect_ratio(img_b, 460, 580)
-            img_a = resize_with_aspect_ratio(img_a, 460, 580)
+            img_b = resize_with_aspect_ratio(img_b, 460, 550)
+            img_a = resize_with_aspect_ratio(img_a, 460, 550)
             
             img.paste(img_b, (90, card_y + 25))
             img.paste(img_a, (650, card_y + 25))
             
-            # 카드 하단 라벨 뱃지
-            draw.rectangle([250, card_y + 620, 410, card_y + 660], fill="#F1F5F9")
-            draw.text((290, card_y + 627), "Before", font=font_bold, fill="#475569")
+            draw.rectangle([230, card_y + 595, 370, card_y + 635], fill="#F1F5F9")
+            draw.text((270, card_y + 602), "Before", font=font_bold, fill="#475569")
             
-            draw.rectangle([810, card_y + 620, 970, card_y + 660], fill="#EFF6FF")
-            draw.text((855, card_y + 627), "After", font=font_bold, fill="#2563EB")
+            draw.rectangle([790, card_y + 595, 930, card_y + 635], fill="#EFF6FF")
+            draw.text((833, card_y + 602), "After", font=font_bold, fill="#2563EB")
         except Exception:
             pass
             
-    # 4. 하단 상세 내역 및 점수 산정 박스 (폭 1080)
-    box_y = 930
-    draw.rectangle([60, box_y, 1140, box_y + 390], fill="white", outline="#CBD5E1", width=2)
-    draw.text((90, 960), "📌 위드멤버 플레이스 중점 관리 및 상승 내역", font=font_bold, fill="#0F172A")
+    # 하단 요약 박스 (X: 60~1140, 폭 1080)
+    box_y = 925
+    draw.rectangle([60, box_y, 1140, box_y + 400], fill="white", outline="#CBD5E1", width=2)
+    draw.text((90, 955), "📌 위드멤버 플레이스 중점 관리 및 상승 내역", font=font_bold, fill="#0F172A")
     
-    y_pos = 1025
+    y_pos = 1020
     details = [("기본 플레이스 SEO 최적화 및 정보 정비", "+30점", True)]
     if use_b:
         details.append(("네이버 예약 연동 (고객 편의성 및 체류 시간 증대)", "+12점", True))
@@ -167,11 +151,10 @@ def generate_result_image(before_upload, after_upload, use_b, use_t, use_c, tota
     for text, score, active in details:
         draw.text((100, y_pos), f"• {text}", font=font_body, fill="#334155" if active else "#94A3B8")
         draw.text((1000, y_pos), score, font=font_body, fill="#2563EB" if active else "#94A3B8")
-        y_pos += 45
+        y_pos += 46
         
     draw.line([(90, y_pos + 5), (1110, y_pos + 5)], fill="#E2E8F0", width=2)
     
-    # 최종 점수 강조 박스
     draw.rectangle([90, y_pos + 25, 1110, y_pos + 95], fill="#FEF2F2", outline="#FECACA", width=2)
     draw.text((120, y_pos + 42), f"✅ 확보된 플레이스 최적화 점수 총합: {total_score}점 상승", font=font_badge, fill="#DC2626")
     
@@ -179,28 +162,25 @@ def generate_result_image(before_upload, after_upload, use_b, use_t, use_c, tota
     img.save(buf, format="PNG")
     return buf.getvalue()
 
-# === [전문 에이전시급 2번 이미지 생성 함수] ===
 def generate_solution_image(expected_revenue):
     font_path = load_font()
-    # 고해상도 규격 (1200 x 1650)
-    img = Image.new('RGB', (1200, 1650), color="#F8FAFC")
+    img = Image.new('RGB', (1200, 1700), color="#F8FAFC")
     draw = ImageDraw.Draw(img)
     
     try:
-        font_title = ImageFont.truetype(font_path, 42) if font_path else ImageFont.load_default()
-        font_sub = ImageFont.truetype(font_path, 28) if font_path else ImageFont.load_default()
-        font_body = ImageFont.truetype(font_path, 20) if font_path else ImageFont.load_default()
-        font_bold = ImageFont.truetype(font_path, 24) if font_path else ImageFont.load_default()
-        font_rev = ImageFont.truetype(font_path, 36) if font_path else ImageFont.load_default()
+        font_title = ImageFont.truetype(font_path, 40) if font_path else ImageFont.load_default()
+        font_sub = ImageFont.truetype(font_path, 26) if font_path else ImageFont.load_default()
+        font_body = ImageFont.truetype(font_path, 19) if font_path else ImageFont.load_default()
+        font_bold = ImageFont.truetype(font_path, 22) if font_path else ImageFont.load_default()
+        font_rev = ImageFont.truetype(font_path, 34) if font_path else ImageFont.load_default()
     except:
         font_title = font_sub = font_body = font_bold = font_rev = ImageFont.load_default()
 
-    # 1. 상단 프리미엄 헤더 바
-    draw.rectangle([0, 0, 1200, 130], fill="#0F172A")
-    draw.text((60, 42), "위드멤버 1년 마케팅 솔루션 제안서", font=font_title, fill="white")
+    # 상단 헤더 (높이 140, 수직 중앙 정렬)
+    draw.rectangle([0, 0, 1200, 140], fill="#0F172A")
+    draw.text((60, 48), "위드멤버 1년 마케팅 솔루션 제안서", font=font_title, fill="white")
     
-    # 2. 솔루션 안내 섹션
-    draw.text((60, 165), "[ 전문적인 마케팅 관리 솔루션 ]", font=font_sub, fill="#1E293B")
+    draw.text((60, 180), "[ 전문적인 마케팅 관리 솔루션 ]", font=font_sub, fill="#1E293B")
     
     services = [
         ("1. 네이버 플레이스 세팅 및 관리 (SEO최적화)", "단순 세팅을 넘어선 알고리즘 맞춤형 순위 최적화 및 지속 관리"),
@@ -209,39 +189,33 @@ def generate_solution_image(expected_revenue):
         ("4. 평점 및 리뷰 매니지먼트", "카카오맵 및 구글 맵스 고품질 리뷰 30건 구축으로 매장 신뢰도 극대화")
     ]
     
-    y = 225
+    y = 240
     for title, desc in services:
-        # 각 솔루션 항목 카드 박스
-        draw.rectangle([60, y, 1140, y + 85], fill="white", outline="#E2E8F0", width=2)
-        # 왼쪽 포인트 바
-        draw.rectangle([60, y, 72, y + 85], fill="#2563EB")
+        draw.rectangle([60, y, 1140, y + 90], fill="white", outline="#CBD5E1", width=2)
+        draw.rectangle([60, y, 74, y + 90], fill="#2563EB")
         
-        draw.text((95, y + 14), title, font=font_bold, fill="#2563EB")
-        draw.text((95, y + 48), f"- {desc}", font=font_body, fill="#475569")
-        y += 100
+        draw.text((100, y + 16), title, font=font_bold, fill="#2563EB")
+        draw.text((100, y + 52), f"- {desc}", font=font_body, fill="#475569")
+        y += 105
         
     draw.line([(60, y + 15), (1140, y + 15)], fill="#CBD5E1", width=2)
-    y += 45
+    y += 50
     
-    # 3. 매출 상승 예측 섹션
     draw.text((60, y), "[ 3개월 뒤 예상 상승 매출액 및 추이 ]", font=font_sub, fill="#1E293B")
     y += 55
     
-    # 매출 강조 박스 (완벽한 중앙 배치)
     draw.rectangle([60, y, 1140, y + 95], fill="#FEF2F2", outline="#FECACA", width=2)
     rev_text = f"💰 총 예상 상승액: {expected_revenue:,} 원"
-    draw.text((340, y + 28), rev_text, font=font_rev, fill="#DC2626")
+    draw.text((360, y + 28), rev_text, font=font_rev, fill="#DC2626")
     
     y += 135
     
-    # 4. 고품질 꺾은선 그래프 영역 (완벽한 대칭 및 중앙 정렬)
-    graph_x, graph_y = 120, y
-    graph_w, graph_h = 960, 280
+    # 그래프 영역 (X: 120~1080, 폭 960)
+    graph_x, graph_y = 120, y + 20
+    graph_w, graph_h = 960, 260
     
-    # 그래프 배경 카드 박스
-    draw.rectangle([60, y - 20, 1140, y + graph_h + 80], fill="white", outline="#E2E8F0", width=2)
+    draw.rectangle([60, y, 1140, y + graph_h + 90], fill="white", outline="#CBD5E1", width=2)
     
-    # X축 기준선
     draw.line([(graph_x, graph_y + graph_h), (graph_x + graph_w, graph_y + graph_h)], fill="#94A3B8", width=3)
     
     labels = ["관리 시작", "1개월 차", "2개월 차", "3개월 차"]
@@ -254,15 +228,12 @@ def generate_solution_image(expected_revenue):
         py = (graph_y + graph_h) - (graph_h * (values[i] / expected_revenue))
         points.append((px, py))
         
-        # X축 라벨
-        draw.text((px - 40, graph_y + graph_h + 20), labels[i], font=font_body, fill="#475569")
+        draw.text((px - 35, graph_y + graph_h + 22), labels[i], font=font_body, fill="#475569")
         
-        # 데이터 포인트별 금액 수치
         if i > 0:
             val_text = f"{int(values[i]/10000):,}만"
-            draw.text((px - 35, py - 40), val_text, font=font_bold, fill="#2563EB")
+            draw.text((px - 32, py - 38), val_text, font=font_bold, fill="#2563EB")
 
-    # 그래프 선 및 데이터 포인트 원형 강조
     draw.line(points, fill="#2563EB", width=5)
     for p in points:
         draw.ellipse([p[0]-8, p[1]-8, p[0]+8, p[1]+8], fill="#DC2626", outline="white", width=3)
