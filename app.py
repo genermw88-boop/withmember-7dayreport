@@ -10,7 +10,6 @@ if 'expected_rev' not in st.session_state:
 st.title("📊 위드멤버 마케팅 보고서 & 1년 솔루션 통합 시스템")
 st.markdown("---")
 
-# 1. 사이드바 또는 상단 입력부 설정
 st.sidebar.header("⚙️ 리포트 설정 및 이미지 입력")
 before_file = st.sidebar.file_uploader("Before 이미지 업로드", type=['png', 'jpg', 'jpeg'])
 after_file = st.sidebar.file_uploader("After 이미지 업로드", type=['png', 'jpg', 'jpeg'])
@@ -59,7 +58,6 @@ m1 = int(rev * 0.25 / 10000)
 m2 = int(rev * 0.60 / 10000)
 m3 = int(rev / 10000)
 
-# 2. 하나의 완벽한 보고서 및 제안서 통합 HTML 코드로 작성 (html2canvas 버튼 포함)
 integrated_report_html = f"""
 <!DOCTYPE html>
 <html>
@@ -85,7 +83,6 @@ integrated_report_html = f"""
     </div>
 
     <div id="capture-area">
-        <!-- 첫 번째 섹션: 1주 무료체험 결과 요약 보고서 -->
         <div class="report-card">
             <div class="header-banner">
                 위드멤버 1주 무료체험 결과 요약 보고서
@@ -117,7 +114,6 @@ integrated_report_html = f"""
             </div>
         </div>
 
-        <!-- 두 번째 섹션: 1년 마케팅 솔루션 제안서 -->
         <div class="report-card">
             <div class="header-banner">
                 위드멤버 1년 마케팅 솔루션 제안서
@@ -175,7 +171,7 @@ integrated_report_html = f"""
 <script>
 function downloadFullReport() {{
     const target = document.getElementById('capture-area');
-    html2canvas(target, {{ scale: 2, useCORS: true }F}).then(canvas => {{
+    html2canvas(target, {{ scale: 2, useCORS: true }}).then(canvas => {{
         const link = document.createElement('a');
         link.download = '위드멤버_마케팅_통합보고서.png';
         link.href = canvas.toDataURL('image/png');
