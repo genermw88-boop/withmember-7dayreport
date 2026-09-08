@@ -158,12 +158,12 @@ separate_reports_html = f"""
                 <div style="font-size: 13px; color: #475569;">- 매장 타겟층 정밀 분석을 통한 최적화 블로그 후보 검수 및 추천 배포</div>
             </div>
             <div style="background: #F8FAFC; padding: 14px 18px; border: 1px solid #E2E8F0; border-radius: 6px; border-left: 5px solid #2563EB;">
-                <div style="font-weight: bold; color: #2563EB; margin-bottom: 4px; font-size: 14px;">3. 숏폼 영상 콘텐츠 기획 및 제작</div>
-                <div style="font-size: 13px; color: #475569;">- 트렌디한 홍보 영상 제작 후 인스타그램 릴스 및 유튜브 쇼츠 배포</div>
+                <div style="font-weight: bold; color: #2563EB; margin-bottom: 4px; font-size: 14px;">3. 월 1회 홍보용인스타 인기 게시물 베포 </div>
+                <div style="font-size: 13px; color: #475569;">- 트렌디한 이미지 편집 및 제작 후 인스타그램 인기게시물 배포</div>
             </div>
             <div style="background: #F8FAFC; padding: 14px 18px; border: 1px solid #E2E8F0; border-radius: 6px; border-left: 5px solid #2563EB;">
-                <div style="font-weight: bold; color: #2563EB; margin-bottom: 4px; font-size: 14px;">4. 평점 및 리뷰 매니지먼트</div>
-                <div style="font-size: 13px; color: #475569;">- 카카오맵 및 구글 맵스 고품질 리뷰 30건 구축으로 매장 신뢰도 극대화</div>
+                <div style="font-weight: bold; color: #2563EB; margin-bottom: 4px; font-size: 14px;">4. 네이버 플레이스 순위, 노출 변화 유지 및 관리</div>
+                <div style="font-size: 13px; color: #475569;">- 월 1~2회 플레이스 대표키워드, 새소식, 이미지 기본 수정</div>
             </div>
             <div style="background: #F8FAFC; padding: 14px 18px; border: 1px solid #E2E8F0; border-radius: 6px; border-left: 5px solid #2563EB;">
                 <div style="font-weight: bold; color: #2563EB; margin-bottom: 4px; font-size: 14px;">5. 트래픽 작업을 통한 플레이스 순위 상승</div>
